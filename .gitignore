@@ -1,0 +1,27 @@
+# secrets & personal config — never commit
+.env
+*.env
+*-key.json
+*.key.json
+config/chase.yaml
+terraform.tfvars
+infra/envs/*/terraform.tfvars
+.terraform/
+*.tfstate*
+
+# audio, data, reports
+*.wav
+*.flac
+*.mp3
+*.sqlite
+*.db
+data/
+reports/
+*.pdf
+
+# tooling
+__pycache__/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.superpowers/
