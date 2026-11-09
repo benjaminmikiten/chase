@@ -7,11 +7,12 @@ tunable (`chase replay`) and restart-safe (recompute from the log at any time).
 from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import replace
 from datetime import datetime, timedelta
 from statistics import fmean
 
 from chase.config import RuleConfig
-from chase.model import BarkWindow, Episode, RunStatus
+from chase.model import BarkWindow, Episode, RunStatus, Violation
 
 _ID_FORMAT = "%Y%m%dT%H%M%SZ"
 
@@ -138,3 +139,56 @@ def current_run(
         duration_seconds=duration,
         seconds_until_episode=max(0.0, rules.episode_min_minutes * 60 - duration),
     )
+
+
+def violation_id(first_episode_start: datetime) -> str:
+    return "v-" + first_episode_start.strftime(_ID_FORMAT)
+
+
+def assign_violations(
+    existing: Sequence[Violation], episodes: Sequence[Episode], rules: RuleConfig
+) -> list[Violation]:
+    """Group episodes into violations.
+
+    - Each episode belongs to at most one violation; assignments in `existing` are kept.
+    - A violation's window runs `violation_window_hours` from the start of its first episode.
+      Later episodes starting inside the window join it (revision += 1 each).
+    - Other episodes collect in a pool; entries a full window older than the newest are dropped.
+      When the pool reaches `episodes_per_window`, it becomes a new violation.
+
+    Pure and idempotent: feeding the output back with the same episodes returns an equal list,
+    and feeding episodes incrementally gives the same result as feeding them all at once.
+    """
+    window = timedelta(hours=rules.violation_window_hours)
+    violations = {v.id: v for v in existing}
+    assigned = {eid for v in existing for eid in v.episode_ids}
+    pool: list[Episode] = []
+
+    for e in sorted(episodes, key=lambda e: e.start):
+        if e.id in assigned:
+            continue
+        home = next(
+            (v for v in violations.values() if v.window_start <= e.start < v.window_end), None
+        )
+        if home is not None:
+            violations[home.id] = replace(
+                home, episode_ids=(*home.episode_ids, e.id), revision=home.revision + 1
+            )
+            assigned.add(e.id)
+            continue
+        pool.append(e)
+        pool = [p for p in pool if e.start - p.start < window]
+        if len(pool) >= rules.episodes_per_window:
+            first = pool[0]
+            v = Violation(
+                id=violation_id(first.start),
+                window_start=first.start,
+                window_end=first.start + window,
+                episode_ids=tuple(p.id for p in pool),
+                revision=1,
+            )
+            violations[v.id] = v
+            assigned.update(v.episode_ids)
+            pool = []
+
+    return sorted(violations.values(), key=lambda v: v.window_start)
