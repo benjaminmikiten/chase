@@ -1,0 +1,60 @@
+// Metrics: scrape the listener and remote_write to Grafana Cloud Prometheus.
+prometheus.scrape "chase" {
+  targets         = [{"__address__" = "listener:9100", "job" = "chase"}]
+  scrape_interval = "15s"
+  forward_to      = [prometheus.remote_write.grafana_cloud.receiver]
+}
+
+prometheus.remote_write "grafana_cloud" {
+  endpoint {
+    url = sys.env("GRAFANA_PROM_URL")
+    basic_auth {
+      username = sys.env("GRAFANA_PROM_USER")
+      password = sys.env("GRAFANA_TOKEN")
+    }
+  }
+}
+
+// Logs: the listener's JSON events (episode, violation, capture_error, ...) to Grafana Cloud Loki.
+discovery.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+discovery.relabel "listener" {
+  targets = discovery.docker.containers.targets
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    regex         = "listener"
+    action        = "keep"
+  }
+  rule {
+    target_label = "container"
+    replacement  = "listener"
+  }
+}
+
+loki.source.docker "listener" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.relabel.listener.output
+  forward_to = [loki.process.events.receiver]
+}
+
+loki.process "events" {
+  stage.json {
+    expressions = { event = "event" }
+  }
+  stage.labels {
+    values = { event = "" }
+  }
+  forward_to = [loki.write.grafana_cloud.receiver]
+}
+
+loki.write "grafana_cloud" {
+  endpoint {
+    url = sys.env("GRAFANA_LOKI_URL")
+    basic_auth {
+      username = sys.env("GRAFANA_LOKI_USER")
+      password = sys.env("GRAFANA_TOKEN")
+    }
+  }
+}

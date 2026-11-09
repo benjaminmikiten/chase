@@ -1,0 +1,81 @@
+# Running chase on the OptiPlex
+
+Plan 1 runs entirely on the OptiPlex: the listener detects barking, logs it, writes evidence to
+a local outbox, and Grafana Alloy ships metrics and events to Grafana Cloud. (Uploading the
+evidence and emailing reports arrives with Plan 2.)
+
+## 1. Prerequisites
+
+- Linux with Docker Engine + the Compose plugin.
+- **A synced clock.** Evidence timestamps depend on it:
+  ```bash
+  timedatectl   # expect: System clock synchronized: yes
+  ```
+- A USB microphone, pointed at the yards you care about.
+
+## 2. Find the microphone
+
+```bash
+arecord -l
+# card 2: Device [USB Audio Device], device 0: USB Audio [USB Audio]
+```
+
+Use the card name or index as `audio_device` (or leave `null` for the system default).
+
+## 3. Configure
+
+```bash
+cp config/chase.example.yaml config/chase.yaml   # git-ignored
+cp .env.example .env                              # git-ignored
+```
+
+- `config/chase.yaml`: set `audio_device`; keep `rules: {preset: san-antonio}` or override
+  thresholds there.
+- `.env`: Grafana Cloud Prometheus and Loki URLs and users, plus an access-policy token with
+  `metrics:write` and `logs:write`.
+
+## 4. Start
+
+```bash
+docker compose up -d --build
+docker compose logs -f listener      # JSON events: listener_started, episode, violation, ...
+curl -s localhost:9100/metrics | grep chase_   # only if you publish the port; or:
+docker compose exec listener curl -s localhost:9100/metrics | grep chase_heartbeat
+```
+
+Quick check: play a dog-bark video near the mic. `chase_barking_windows_total` should rise,
+and backlog clips should appear:
+
+```bash
+docker compose exec listener ls /data/backlog | tail
+```
+
+## 5. Dashboard
+
+Grafana Cloud -> Dashboards -> New -> Import -> upload `grafana/dashboard.json`, then pick your
+Prometheus and Loki data sources.
+
+## 6. Tune the rules against real history
+
+`chase replay` re-runs the rules over everything logged so far, read-only:
+
+```bash
+docker compose run --rm listener replay --config /config/chase.yaml --presets /config/presets \
+  --since 2026-11-01
+# Try stricter or looser thresholds without touching the live service:
+docker compose run --rm listener replay --config /config/chase.yaml --presets /config/presets \
+  --preset /config/presets/my-experiment.yaml
+```
+
+When you like a result, put those thresholds in `config/chase.yaml` and
+`docker compose restart listener`.
+
+## Where things live (the `chase-data` volume)
+
+| Path | What | Leaves the machine? |
+|---|---|---|
+| `/data/chase.sqlite` | bark log (source of truth) | no |
+| `/data/spool/` | last ~2 h of audio, 1-min FLAC segments | no |
+| `/data/outbox/episodes/<id>/` | episode FLAC (30 s pre/post-roll) + metadata.json | Plan 2 uploads it |
+| `/data/outbox/violations/<id>/rev-N.json` | violation manifests | Plan 2 uploads it |
+| `/data/backlog/` | short clips of every barking window, kept 90 days (for the v2 classifier) | no |
