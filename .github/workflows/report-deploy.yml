@@ -1,0 +1,79 @@
+# Builds the report image and deploys it to the `report` Cloud Run service.
+#
+# Runs only after CI succeeds on main, so a red build never deploys, and pull requests never
+# deploy. Auth is Workload Identity Federation (no key files): the chase-ci service account can
+# push to the `chase` Artifact Registry repo and deploy `report` (infra/envs/prod/wif.tf).
+#
+# Until the cloud side is bootstrapped the repo variables don't exist, and this workflow
+# exits cleanly with a notice, so merging before bootstrap stays green. Variables (set by
+# infra/bootstrap.sh's printed `gh variable set` commands): GCP_WORKLOAD_IDENTITY_PROVIDER,
+# GCP_SERVICE_ACCOUNT, GCP_ARTIFACT_REGISTRY_URL, GCP_REGION.
+name: Report (build and deploy)
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: report-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      SHA: ${{ github.event.workflow_run.head_sha }}
+      WIF_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT }}
+      REGISTRY: ${{ vars.GCP_ARTIFACT_REGISTRY_URL }}
+      REGION: ${{ vars.GCP_REGION }}
+    steps:
+      - name: Check the cloud side is set up
+        id: ready
+        run: |
+          if [ -z "$WIF_PROVIDER" ] || [ -z "$SERVICE_ACCOUNT" ] || [ -z "$REGISTRY" ] || [ -z "$REGION" ]; then
+            echo "::notice::Report deploy skipped: GCP repo variables not set yet (run infra/bootstrap.sh)."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.ready.outputs.ready == 'true'
+        with:
+          ref: ${{ env.SHA }}
+
+      - uses: google-github-actions/auth@v2
+        if: steps.ready.outputs.ready == 'true'
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+        if: steps.ready.outputs.ready == 'true'
+
+      - name: Build and push
+        if: steps.ready.outputs.ready == 'true'
+        run: |
+          gcloud auth configure-docker "${REGISTRY%%/*}" --quiet
+          docker build -t "$REGISTRY/report:$SHA" report
+          docker push "$REGISTRY/report:$SHA"
+
+      - name: Deploy
+        if: steps.ready.outputs.ready == 'true'
+        run: |
+          gcloud run deploy report --image "$REGISTRY/report:$SHA" --region "$REGION" --quiet
+          gcloud run services describe report --region "$REGION" --format='value(status.url,status.latestReadyRevisionName)'
