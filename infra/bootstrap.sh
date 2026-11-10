@@ -10,8 +10,8 @@
 #   3. links billing                                  6. terraform init
 #   4. creates the versioned Terraform state bucket   7. YOU run terraform plan / apply
 #   8. stores the two secrets (Gmail app password, report config JSON) in Secret Manager
-#   9. creates the listener's service-account key in ./secrets/ (never in Terraform state)
-#  10. prints the `gh variable set` commands for the deploy workflow (it does not run them)
+#   9. deploy the real report image (prints `gh variable set`), enable push, send a TEST report
+#  10. ONLY THEN creates the listener key and tells you how to connect the OptiPlex
 #
 # It never runs `terraform apply`, and it remembers non-secret answers in
 # ~/.config/chase-bootstrap/env.
@@ -129,13 +129,35 @@ if confirm "Set or replace the report details (name, address, phone, emails, nei
   ask R_EMAIL "Gmail address that sends the report (the app password's account)"
   ask R_TO "Where reports are sent (usually the same address)" "$R_EMAIL"
   ask R_NEIGHBORS "Neighboring addresses to list, separated by ';' (may be empty)"
-  jq -n --arg n "$R_NAME" --arg a "$R_ADDR" --arg p "$R_PHONE" --arg e "$R_EMAIL" --arg t "$R_TO" --arg nb "$R_NEIGHBORS" \
-    '{name:$n,address:$a,phone:$p,email:$e,to_email:$t,
+  ask R_TZ "Your timezone (IANA name)" "America/Chicago"
+  jq -n --arg n "$R_NAME" --arg a "$R_ADDR" --arg p "$R_PHONE" --arg e "$R_EMAIL" --arg t "$R_TO" --arg nb "$R_NEIGHBORS" --arg tz "$R_TZ" \
+    '{name:$n,address:$a,phone:$p,email:$e,to_email:$t,timezone:$tz,
       neighbor_addresses: ($nb | split(";") | map(gsub("^\\s+|\\s+$";"")) | map(select(length>0)))}' \
     | gcloud secrets versions add chase-report-config --project="$PROJECT_ID" --data-file=-
 fi
 
-stage "9/10 Listener key (create-only; ADR 0004)"
+stage "9/10 Deploy the real report image, enable push, send a TEST report"
+say "a) Set the deploy workflow's repo variables (copy and run):"
+cat <<EOF
+  gh variable set GCP_WORKLOAD_IDENTITY_PROVIDER --body "$(OUT workload_identity_provider)"
+  gh variable set GCP_SERVICE_ACCOUNT --body "$(OUT ci_service_account)"
+  gh variable set GCP_ARTIFACT_REGISTRY_URL --body "$(OUT artifact_registry_url)"
+  gh variable set GCP_REGION --body "$(OUT region)"
+EOF
+say "b) Deploy: re-run the latest 'Report (build and deploy)' workflow on main (gh run rerun), or push to main."
+say "   Until this is done the service is a placeholder; that's why push delivery is still OFF."
+confirm "Has the deploy workflow finished green?" || { say "Re-run this script after deploying."; exit 0; }
+say "c) Turn on delivery: add  report_push_enabled = true  to $TF_DIR/terraform.tfvars, then plan + apply."
+confirm "Applied with report_push_enabled = true?" || { say "Re-run this script after applying."; exit 0; }
+say "d) Send one TEST report:  bash infra/send-test-violation.sh $(OUT evidence_bucket)"
+say "   Expect an email whose subject starts with '[TEST] Barking dog complaint' within a few minutes."
+if ! confirm "Did the [TEST] email arrive with the PDF?"; then
+  say "Check: gcloud logging read 'resource.labels.service_name=\"report\"' --freshness 15m"
+  say "If push is rejected before the app logs anything, set report_ingress = \"INGRESS_TRAFFIC_ALL\" and apply."
+  exit 0
+fi
+
+stage "10/10 Connect the OptiPlex (last, so nothing is reported before the pipeline works)"
 KEY="$ROOT/secrets/listener-key.json"
 if [[ -f "$KEY" ]]; then
   say "✓ $KEY exists (delete it and re-run to rotate; remove old keys in the console)"
@@ -144,18 +166,10 @@ elif confirm "Create a key for $(OUT listener_service_account) into $KEY?"; then
   gcloud iam service-accounts keys create "$KEY" --iam-account="$(OUT listener_service_account)" --project="$PROJECT_ID"
   chmod 600 "$KEY"
 fi
-say "Copy it to the OptiPlex:"
-say "  scp $KEY wizard@orb:~/chase/secrets/listener-key.json"
-say "Then on the OptiPlex, in config/chase.yaml:  gcs_bucket: $(OUT evidence_bucket)   and run: make restart"
-say "Check it:  bash infra/smoke-iam.sh $(OUT evidence_bucket) $KEY"
-
-stage "10/10 GitHub variables for the deploy workflow (copy and run)"
-cat <<EOF
-  gh variable set GCP_WORKLOAD_IDENTITY_PROVIDER --body "$(OUT workload_identity_provider)"
-  gh variable set GCP_SERVICE_ACCOUNT --body "$(OUT ci_service_account)"
-  gh variable set GCP_ARTIFACT_REGISTRY_URL --body "$(OUT artifact_registry_url)"
-  gh variable set GCP_REGION --body "$(OUT region)"
-EOF
-say "Then re-run the 'Report (build and deploy)' workflow, or push to main, to deploy the real image."
-say "Finally, send one TEST report:  bash infra/send-test-violation.sh $(OUT evidence_bucket)"
+say "Check its permissions:  bash infra/smoke-iam.sh $(OUT evidence_bucket) $KEY"
+say "Before enabling uploads, check for old violations on the OptiPlex (make violations): every one"
+say "already in the outbox will be emailed. Move any you don't want reported out of /data/outbox first."
+say "Then copy the key and turn uploads on:"
+say "  scp $KEY <user>@<optiplex>:~/chase/secrets/listener-key.json"
+say "  on the OptiPlex, in config/chase.yaml:  gcs_bucket: $(OUT evidence_bucket)   then: make restart"
 printf '\n%sDone.%s\n' "$bold" "$reset"

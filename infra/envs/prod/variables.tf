@@ -38,6 +38,12 @@ variable "report_ingress" {
   default     = "INGRESS_TRAFFIC_INTERNAL_ONLY"
 }
 
+variable "report_push_enabled" {
+  description = "Deliver violation notifications to the report service. Leave false until CI has deployed the real report image (the initial placeholder would ack and drop them); messages are retained meanwhile."
+  type        = bool
+  default     = false
+}
+
 variable "attachment_limit_mb" {
   description = "Email attachment budget in base64-encoded MB. Over it, audio is linked instead of attached."
   type        = number

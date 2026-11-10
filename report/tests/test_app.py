@@ -163,3 +163,46 @@ def test_http_failure_is_500_and_logged(client, capsys):
         json.loads(line) for line in capsys.readouterr().out.splitlines() if line.startswith("{")
     ]
     assert any(r["event"] == "report_failed" and r["severity"] == "ERROR" for r in logs)
+
+
+def _rev2_store() -> FakeStore:
+    s = store()
+    raw = json.loads(s.objects[NAME])
+    raw["revision"] = 2
+    s.objects[f"violations/{V}/rev-2.json"] = json.dumps(raw).encode()
+    return s
+
+
+def test_rev2_without_a_sent_rev1_is_not_called_updated(tmp_path):
+    s, m = _rev2_store(), FakeMailer()
+    out = process(
+        s,
+        f"violations/{V}/rev-2.json",
+        SENDER,
+        m,
+        tmp_path,
+        today=date(2026, 11, 9),
+        encode=fake_encode,
+        pdf_renderer=fake_pdf,
+    )
+    assert out == "sent"
+    assert "(updated)" not in m.sent[0]["Subject"]
+
+
+def test_rev2_after_rev1_was_sent_is_updated(tmp_path):
+    s, m = store(), FakeMailer()
+    run(s, m, tmp_path)
+    raw = json.loads(s.objects[NAME])
+    raw["revision"] = 2
+    s.objects[f"violations/{V}/rev-2.json"] = json.dumps(raw).encode()
+    process(
+        s,
+        f"violations/{V}/rev-2.json",
+        SENDER,
+        m,
+        tmp_path,
+        today=date(2026, 11, 9),
+        encode=fake_encode,
+        pdf_renderer=fake_pdf,
+    )
+    assert m.sent[-1]["Subject"].endswith("(updated)")

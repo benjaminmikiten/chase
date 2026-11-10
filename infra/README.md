@@ -27,30 +27,38 @@ the free tier at this volume, and the bucket holds a few hundred MB.
 
 ## Morning checklist (first-time setup)
 
-1. **Bootstrap and apply.** Run `bash infra/bootstrap.sh`. It creates the project, links
-   billing, creates the state bucket, writes `terraform.tfvars`, and runs `terraform init`. When it
-   says so, run `terraform plan` and `terraform apply` yourself in `infra/envs/prod`.
-2. **Secrets.** Continue the script. It stores:
-   - the Gmail app password (the Google account must have **2-Step Verification on**);
-   - your report details: name, address, phone, sender and recipient emails, and neighboring
-     addresses. These never touch the repo.
-3. **Listener key.** The script creates `secrets/listener-key.json`. Copy it to the OptiPlex
-   (`~/chase/secrets/listener-key.json`), add `gcs_bucket: <bucket>` to `config/chase.yaml` there,
-   and run `make restart`.
-4. **IAM smoke test.** Run `bash infra/smoke-iam.sh <bucket> secrets/listener-key.json`. Every line
-   should say PASS.
-5. **Deploy the real image.** Run the four `gh variable set …` lines the script prints, then
-   re-run the *Report (build and deploy)* workflow (or push to main).
-6. **One TEST report end to end.** Run `bash infra/send-test-violation.sh <bucket>`. Within a couple
-   of minutes you should get an email whose subject starts with **`[TEST] Barking dog complaint`**,
-   with the PDF and MP3s attached.
-   - If nothing arrives, check the logs:
-     `gcloud logging read 'resource.labels.service_name="report"' --freshness 15m`.
-   - **If the logs show Pub/Sub push being rejected (403 or 404 before the app logs anything):**
-     set `report_ingress = "INGRESS_TRAFFIC_ALL"` in `terraform.tfvars` and apply. IAM still lets
-     only `chase-push` invoke the service.
-7. **Confirm uploads from the OptiPlex.** Run `make status` there. `chase_outbox_pending` should
-   drop to 0 after the next episode.
+The order matters: the OptiPlex is connected **last**, so nothing is reported until the whole
+pipeline has proved itself with a TEST report. `bash infra/bootstrap.sh` walks through all of it.
+
+1. **Bootstrap and apply.** The script creates the project, billing, state bucket,
+   `terraform.tfvars` and `terraform init`. You run `terraform plan -out=tfplan` and
+   `terraform apply tfplan` in `infra/envs/prod`.
+   - If the first apply fails on the **alert policy** ("Cannot find metric"), the **Pub/Sub
+     service agent**, or the **storage notification**, wait a minute and apply again. Brand-new
+     projects take a moment to create those identities and metrics.
+2. **Secrets.** The script stores:
+   - the Gmail app password (the account needs **2-Step Verification on**);
+   - your report details, including your timezone. These never touch the repo.
+3. **Deploy the real report image.** Run the four `gh variable set …` lines the script prints,
+   then re-run the *Report (build and deploy)* workflow on main.
+4. **Enable delivery.** Set `report_push_enabled = true` in `terraform.tfvars` and apply. Until
+   now the subscription only *kept* notifications, because the placeholder service would have
+   swallowed them.
+5. **One TEST report end to end.** Run `bash infra/send-test-violation.sh <bucket>`. You should
+   get an email whose subject starts with **`[TEST] Barking dog complaint`**, with the PDF.
+   - If nothing arrives, check `gcloud logging read 'resource.labels.service_name="report"' --freshness 15m`.
+   - If Pub/Sub push is rejected before the app logs anything, set
+     `report_ingress = "INGRESS_TRAFFIC_ALL"` and apply. IAM still lets only `chase-push` invoke it.
+   - Click a recording link after about 12 hours to confirm the 7-day links work.
+6. **Connect the OptiPlex, last.**
+   1. The script creates `secrets/listener-key.json`.
+   2. Run `bash infra/smoke-iam.sh <bucket> secrets/listener-key.json`. Every line should say PASS.
+   3. On the OptiPlex, run `make violations`. **Every violation already in the outbox will be
+      emailed** when uploads start, so move any you don't want reported out of `/data/outbox/`
+      first.
+   4. Copy the key to `~/chase/secrets/`, add `gcs_bucket: <bucket>` to `config/chase.yaml`, and
+      run `make restart`.
+7. **Confirm.** Run `make status` on the OptiPlex. `chase_outbox_pending` should drop to 0.
 
 ## Operations
 

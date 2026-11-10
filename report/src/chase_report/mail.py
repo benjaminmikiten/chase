@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import json
 import math
 import smtplib
@@ -28,6 +29,7 @@ class Sender:
     email: str
     to_email: str
     neighbor_addresses: tuple[str, ...]
+    timezone: str = "UTC"  # fallback for episodes recorded before metadata carried a timezone
 
     @classmethod
     def from_json(cls, raw: str) -> Sender:
@@ -39,6 +41,7 @@ class Sender:
             email=d["email"],
             to_email=d["to_email"],
             neighbor_addresses=tuple(d.get("neighbor_addresses", [])),
+            timezone=d.get("timezone", "UTC"),
         )
 
 
@@ -52,11 +55,11 @@ def attach_audio(pdf_bytes: int, mp3_bytes: list[int], limit_encoded_mb: float =
     return encoded <= limit_encoded_mb * MB
 
 
-def subject(view: ReportView, revision: int) -> str:
+def subject(view: ReportView, updated: bool) -> str:
     d = view.day
     n = len(view.episodes)
     s = f"Barking dog complaint: {d:%b} {d.day}, {d.year} ({n} episode{'s' if n != 1 else ''})"
-    s += " (updated)" if revision > 1 else ""
+    s += " (updated)" if updated else ""
     return f"[TEST] {s}" if view.test else s
 
 
@@ -66,15 +69,16 @@ def compose(
     mp3s: list[tuple[str, Path]],
     links: dict[str, str],
     sender: Sender,
-    revision: int,
+    updated: bool,
 ) -> EmailMessage:
+    """`updated` is True only when an earlier revision of this violation was actually emailed."""
     from chase_report.render import letter_text
 
     body = letter_text(view)
     if links:
         lines = [f"- {label}: {url}" for label, url in links.items()]
         body += "\n\nRecordings (these download links expire in 7 days):\n" + "\n".join(lines)
-    if revision > 1:
+    if updated:
         body = (
             "This updated report replaces the earlier one for the same period; it adds the "
             "episodes recorded since.\n\n" + body
@@ -87,7 +91,7 @@ def compose(
         )
 
     msg = EmailMessage()
-    msg["Subject"] = subject(view, revision)
+    msg["Subject"] = subject(view, updated)
     msg["From"] = sender.email
     msg["To"] = sender.to_email
     msg["Message-ID"] = make_msgid(domain="chase.local")
@@ -101,11 +105,20 @@ def compose(
     return msg
 
 
-class SmtpSender:  # pragma: no cover - real network; exercised by the morning TEST report
+class SmtpSender:
     def __init__(self, user: str, app_password: str, host: str = "smtp.gmail.com", port: int = 465):
         self.user, self.password, self.host, self.port = user, app_password, host, port
 
     def send(self, msg: EmailMessage) -> None:
-        with smtplib.SMTP_SSL(self.host, self.port, context=ssl.create_default_context()) as s:
+        s = smtplib.SMTP_SSL(self.host, self.port, context=ssl.create_default_context(), timeout=60)
+        try:
             s.login(self.user, self.password)
             s.send_message(msg)
+        except Exception:
+            with contextlib.suppress(Exception):
+                s.close()
+            raise
+        # Gmail has accepted the message. Anything that goes wrong from here (a bad QUIT reply, a
+        # dropped socket) must not be reported as a failure, or a retry would send it twice.
+        with contextlib.suppress(Exception):
+            s.quit()

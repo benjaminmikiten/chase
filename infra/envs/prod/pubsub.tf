@@ -76,13 +76,21 @@ resource "google_pubsub_subscription" "report" {
   name    = "chase-report-push"
   topic   = google_pubsub_topic.violations.id
 
-  ack_deadline_seconds = 600 # matches the service's 600 s request timeout
+  ack_deadline_seconds       = 600 # matches the service's 600 s request timeout
+  message_retention_duration = "604800s"
 
-  push_config {
-    push_endpoint = google_cloud_run_v2_service.report.uri
-    oidc_token {
-      service_account_email = google_service_account.push.email
-      audience              = google_cloud_run_v2_service.report.uri
+  # Until the real report image is deployed, the service is a placeholder that answers 200 to
+  # anything, which would ack and silently drop reports. So push stays OFF (a pull subscription
+  # that just keeps messages for 7 days) until var.report_push_enabled is set after the first
+  # deploy. Turning it on delivers anything retained meanwhile.
+  dynamic "push_config" {
+    for_each = var.report_push_enabled ? [1] : []
+    content {
+      push_endpoint = google_cloud_run_v2_service.report.uri
+      oidc_token {
+        service_account_email = google_service_account.push.email
+        audience              = google_cloud_run_v2_service.report.uri
+      }
     }
   }
 

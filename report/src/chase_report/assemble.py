@@ -91,11 +91,17 @@ def assemble(
         flac = workdir / f"{eid}.flac"
         mp3 = workdir / f"{eid}.mp3"
         try:
-            store.download(src + "audio.flac", flac)
-            encode(flac, mp3)
-            flac.unlink()
-            digest, size = sha256_file(mp3), mp3.stat().st_size
-            store.upload(dst + "audio.mp3", mp3, "audio/mpeg")
+            if store.exists(dst + "audio.mp3"):
+                # An earlier revision already produced (and emailed the fingerprint of) this MP3.
+                # Reuse it byte for byte; re-encoding could change it under a new ffmpeg build.
+                store.download(dst + "audio.mp3", mp3)
+                digest, size = sha256_file(mp3), mp3.stat().st_size
+            else:
+                store.download(src + "audio.flac", flac)
+                encode(flac, mp3)
+                flac.unlink()
+                digest, size = sha256_file(mp3), mp3.stat().st_size
+                store.upload(dst + "audio.mp3", mp3, "audio/mpeg")
         finally:
             flac.unlink(missing_ok=True)
             mp3.unlink(missing_ok=True)

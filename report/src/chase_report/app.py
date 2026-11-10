@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -66,7 +67,10 @@ def process(
     try:
         manifest = Manifest.from_json(json.loads(store.read_bytes(name)))
         evidence = assemble(store, manifest, workdir, encode)
-        tz = ZoneInfo(evidence.episodes[0].meta.timezone) if evidence.episodes else UTC
+        tzname = (
+            evidence.episodes[0].meta.timezone if evidence.episodes else None
+        ) or sender.timezone
+        tz = ZoneInfo(tzname)
         today = today or datetime.now(tz).date()
 
         links: dict[str, str] = {
@@ -90,7 +94,12 @@ def process(
                     store.signed_url(e.mp3_name, hours=168)
                 )
 
-        msg = compose(view, pdf, mp3s, links, sender, rev)
+        sent_rev = re.compile(rf"^evidence/{re.escape(vid)}/rev-(\d+)/sent\.json$")
+        updated = any(
+            (m := sent_rev.match(n)) and int(m.group(1)) < rev
+            for n in store.list(f"evidence/{vid}/")
+        )
+        msg = compose(view, pdf, mp3s, links, sender, updated)
         mailer.send(msg)
         sent = True
         store.put_bytes(

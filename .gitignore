@@ -1,5 +1,6 @@
 # secrets & personal config — never commit
-secrets/
+secrets/*
+!secrets/.gitkeep
 .env
 *.env
 *-key.json

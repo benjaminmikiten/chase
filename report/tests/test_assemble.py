@@ -68,3 +68,22 @@ def test_ffmpeg_failure_raises(tmp_path):
     bad.write_bytes(b"not audio")
     with pytest.raises(RuntimeError, match="ffmpeg"):
         ffmpeg_mp3(bad, tmp_path / "x.mp3")
+
+
+def test_existing_evidence_mp3_is_reused_not_reencoded(tmp_path):
+    import hashlib
+
+    store = FakeStore.from_dir(BUCKET)
+    first = manifest().episode_ids[0]
+    existing = b"ID3 previously emailed mp3 bytes"
+    store.objects[f"evidence/{V}/episodes/{first}/audio.mp3"] = existing
+    encoded = []
+
+    def encode(src, dst):
+        encoded.append(src.name)
+        fake_encode(src, dst)
+
+    ev = assemble(store, manifest(), tmp_path, encode=encode)
+    assert ev.episodes[0].mp3_sha256 == hashlib.sha256(existing).hexdigest()
+    assert store.objects[f"evidence/{V}/episodes/{first}/audio.mp3"] == existing
+    assert encoded == [f"{manifest().episode_ids[1]}.flac"]

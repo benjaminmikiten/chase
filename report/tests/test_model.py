@@ -60,4 +60,4 @@ def test_plan1_metadata_without_clock_defaults():
     d = load("episode_metadata.json")
     del d["clock"]
     e = EpisodeMeta.from_json(d)
-    assert e.timezone == "UTC" and e.clock_source == "unknown"
+    assert e.timezone is None and e.clock_source == "unknown"

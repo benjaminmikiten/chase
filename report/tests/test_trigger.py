@@ -59,3 +59,38 @@ def test_claim_once():
     s = store_with(1)
     assert claim(s, V, 1) is True
     assert claim(s, V, 1) is False
+
+
+def _claim_at(s: FakeStore, minutes_ago: float, now) -> None:
+    from datetime import timedelta
+
+    at = (now - timedelta(minutes=minutes_ago)).isoformat()
+    s.objects[f"evidence/{V}/rev-1/claimed.json"] = json.dumps({"claimed_at": at}).encode()
+
+
+def test_stale_claim_without_sent_is_taken_over():
+    from datetime import UTC, datetime
+
+    now = datetime(2026, 11, 10, 12, 0, tzinfo=UTC)
+    s = store_with(1)
+    _claim_at(s, 20, now)  # a crashed/killed attempt left this behind
+    assert decide(s, f"violations/{V}/rev-1.json", now=now) == "process"
+
+
+def test_fresh_claim_is_duplicate():
+    from datetime import UTC, datetime
+
+    now = datetime(2026, 11, 10, 12, 0, tzinfo=UTC)
+    s = store_with(1)
+    _claim_at(s, 5, now)
+    assert decide(s, f"violations/{V}/rev-1.json", now=now) == "duplicate"
+
+
+def test_old_claim_with_sent_is_duplicate():
+    from datetime import UTC, datetime
+
+    now = datetime(2026, 11, 10, 12, 0, tzinfo=UTC)
+    s = store_with(1)
+    _claim_at(s, 600, now)
+    s.objects[f"evidence/{V}/rev-1/sent.json"] = b"{}"
+    assert decide(s, f"violations/{V}/rev-1.json", now=now) == "duplicate"

@@ -59,7 +59,7 @@ class EpisodeMeta:
     flac_sha256: str
     complete: bool
     gaps: tuple[Gap, ...]
-    timezone: str
+    timezone: str | None  # None for Plan 1 files (no "clock"); the report falls back to config
     clock_source: str
 
     @property
@@ -97,7 +97,7 @@ class EpisodeMeta:
                 Gap(_ts(g["start"]), _ts(g["end"]), float(g["seconds"]))
                 for g in audio.get("gaps", [])
             ),
-            timezone=clock.get("timezone", "UTC"),
+            timezone=clock.get("timezone"),
             clock_source=clock.get("source", "unknown"),
         )
 

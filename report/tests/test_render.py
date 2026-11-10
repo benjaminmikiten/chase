@@ -18,6 +18,7 @@ SENDER = Sender(
     email="pat@example.com",
     to_email="pat@example.com",
     neighbor_addresses=("125 Sample St", "200 Other Ave"),
+    timezone="America/Chicago",
 )
 
 
@@ -82,8 +83,20 @@ def test_both_hashes_listed():
 
 def test_times_are_local():
     v = view()
-    assert v.episodes[0].start_local == "6:42:10 AM"
-    assert v.episodes[1].start_local == "10:15:02 PM"
+    assert v.episodes[0].start_local == "6:42:10 AM CST"
+    assert v.episodes[1].start_local == "10:15:02 PM CST"
+    assert "6:42:10 AM CST" in letter_text(v)
+
+
+def test_plan1_episode_without_clock_uses_sender_timezone():
+    from dataclasses import replace as dc_replace
+
+    ev = evidence()
+    eps = tuple(dc_replace(e, meta=dc_replace(e.meta, timezone=None)) for e in ev.episodes)
+    utc_sender = dc_replace(SENDER, timezone="America/Chicago")
+    v = build_view(dc_replace(ev, episodes=eps), utc_sender, {}, date(2026, 11, 9))
+    assert v.episodes[0].start_local == "6:42:10 AM CST"
+    assert v.timezone == "America/Chicago"
 
 
 def test_letter_has_sender_and_addressee():

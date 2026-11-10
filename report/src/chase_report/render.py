@@ -91,9 +91,11 @@ class ReportView:
     test: bool = False
 
 
-def timeline_svg(meta: EpisodeMeta, width: int = 700, height: int = 46) -> str:
+def timeline_svg(
+    meta: EpisodeMeta, timezone: str | None = None, width: int = 700, height: int = 46
+) -> str:
     """Barking (red) vs quiet across the episode, with missing audio hatched, and local times."""
-    tz = ZoneInfo(meta.timezone)
+    tz = ZoneInfo(timezone or meta.timezone or "UTC")
     span = max((meta.end - meta.start).total_seconds(), 1.0)
 
     def x(d: datetime) -> float:
@@ -176,7 +178,8 @@ def build_view(
     evidence: Evidence, sender: Sender, links: dict[str, str], today: date
 ) -> ReportView:
     m = evidence.manifest
-    tzname = evidence.episodes[0].meta.timezone if evidence.episodes else "UTC"
+    first_meta = evidence.episodes[0].meta if evidence.episodes else None
+    tzname = (first_meta.timezone if first_meta else None) or sender.timezone
     tz = ZoneInfo(tzname)
     rows: list[EpisodeRow] = []
     for i, e in enumerate(evidence.episodes, 1):
@@ -196,8 +199,8 @@ def build_view(
             EpisodeRow(
                 number=i,
                 date_local=f"{start:%a}, {start:%b} {start.day}",
-                start_local=_clock(start),
-                end_local=_clock(end),
+                start_local=f"{_clock(start)} {start.tzname()}",
+                end_local=f"{_clock(end)} {end.tzname()}",
                 duration=_duration(meta.duration),
                 barking_minutes=f"{meta.barking_seconds / 60:.1f}",
                 bursts=meta.bursts,
@@ -206,7 +209,7 @@ def build_view(
                 audio_status=status,
                 flac_sha=meta.flac_sha256,
                 mp3_sha=e.mp3_sha256,
-                timeline_svg=timeline_svg(meta),
+                timeline_svg=timeline_svg(meta, tzname),
             )
         )
 
