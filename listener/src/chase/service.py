@@ -163,13 +163,16 @@ class Service:
         for e in final:
             clip_start = e.start - timedelta(seconds=self.s.pre_roll_seconds)
             clip_end = e.end + timedelta(seconds=self.s.post_roll_seconds)
+
+            def render(path, a=clip_start, b=clip_end):
+                return self.spool.write_clip(path, a, b)
+
             try:
-                audio = self.spool.extract(clip_start, clip_end)
                 # Evidence first, then the log: a crash in between re-runs as a no-op write.
                 write_episode(
                     self.outbox,
                     e,
-                    audio,
+                    render,
                     self.s.capture_rate,
                     clip_start,
                     self.s.device_label,
@@ -223,7 +226,7 @@ class Service:
                 start=iso(e.start),
                 end=iso(e.end),
                 duration_seconds=round(e.duration_seconds, 1),
-                bark_count_estimated=e.bark_count,
+                barking_bursts_estimated=e.bark_count,
                 violation_id=owner.get(e.id),
             )
 

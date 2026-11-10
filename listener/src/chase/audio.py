@@ -158,9 +158,27 @@ class Spool:
         return removed
 
     def extract(self, start: datetime, end: datetime) -> np.ndarray:
+        audio, gaps = self._extract(start, end)
+        if gaps:
+            missing = sum((b - a).total_seconds() for a, b in gaps)
+            logger.warning(
+                "spool missing %.1fs of audio between %s and %s",
+                missing,
+                start.isoformat(),
+                end.isoformat(),
+            )
+        return audio
+
+    def _extract(
+        self, start: datetime, end: datetime
+    ) -> tuple[np.ndarray, list[tuple[datetime, datetime]]]:
+        """Audio for [start, end), zero-filled where nothing was recorded, plus those gaps.
+
+        A segment that can't be read (corrupt file) counts as a gap, never an exception.
+        """
         n = max(0, round((end - start).total_seconds() * self.rate))
         out = np.zeros(n, dtype=np.float32)
-        covered = 0
+        filled = np.zeros(n, dtype=bool)
         sources: list[tuple[datetime, int, Path | np.ndarray]] = [
             (s.start, s.frames, s.path) for s in self._segments
         ]
@@ -173,16 +191,52 @@ class Spool:
                 continue
             a, b = lo - offset, hi - offset  # positions within the segment
             if isinstance(src, Path):
-                data, _ = sf.read(str(src), start=a, stop=b, dtype="float32")
+                try:
+                    data, _ = sf.read(str(src), start=a, stop=b, dtype="float32")
+                except (RuntimeError, sf.LibsndfileError):
+                    logger.warning("unreadable spool segment %s", src)
+                    continue
             else:
                 data = src[a:b]
-            out[lo:hi] = data
-            covered += hi - lo
-        if covered < n:
-            logger.warning(
-                "spool missing %.1fs of audio between %s and %s",
-                (n - covered) / self.rate,
-                start.isoformat(),
-                end.isoformat(),
+            out[lo : lo + data.size] = data
+            filled[lo : lo + data.size] = True
+        return out, self._gaps(start, filled)
+
+    def _gaps(self, start: datetime, filled: np.ndarray) -> list[tuple[datetime, datetime]]:
+        gaps: list[tuple[datetime, datetime]] = []
+        if filled.all():
+            return gaps
+        edges = np.flatnonzero(np.diff(np.concatenate([[1], filled.astype(np.int8), [1]])))
+        for lo, hi in zip(edges[::2], edges[1::2], strict=True):
+            gaps.append(
+                (
+                    start + timedelta(seconds=int(lo) / self.rate),
+                    start + timedelta(seconds=int(hi) / self.rate),
+                )
             )
-        return out
+        return gaps
+
+    def write_clip(
+        self, path: Path, start: datetime, end: datetime, chunk_seconds: float = 60.0
+    ) -> list[tuple[datetime, datetime]]:
+        """Stream [start, end) into a FLAC file chunk by chunk (bounded memory).
+
+        Returns the spans that had no audio (written as silence), merged across chunks.
+        """
+        gaps: list[tuple[datetime, datetime]] = []
+        step = timedelta(seconds=chunk_seconds)
+        with sf.SoundFile(
+            str(path), "w", samplerate=self.rate, channels=1, subtype="PCM_16", format="FLAC"
+        ) as f:
+            t = start
+            while t < end:
+                chunk_end = min(end, t + step)
+                audio, chunk_gaps = self._extract(t, chunk_end)
+                f.write(audio)
+                for a, b in chunk_gaps:
+                    if gaps and gaps[-1][1] == a:
+                        gaps[-1] = (gaps[-1][0], b)
+                    else:
+                        gaps.append((a, b))
+                t = chunk_end
+        return gaps

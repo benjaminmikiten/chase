@@ -1,12 +1,16 @@
 import hashlib
 import json
 import os
+from collections.abc import Callable, Sequence
 from datetime import timedelta
+from pathlib import Path
 
 import numpy as np
+import soundfile as sf
 
 from chase.evidence import (
     SCHEMA_VERSION,
+    Gap,
     prune_backlog,
     write_backlog_clip,
     write_episode,
@@ -27,10 +31,18 @@ def _audio(seconds: float) -> np.ndarray:
     return (0.1 * np.sin(np.arange(int(seconds * RATE)) / 10)).astype(np.float32)
 
 
+def _render(seconds: float, gaps: Sequence[Gap] = ()) -> Callable[[Path], list[Gap]]:
+    def render(path: Path) -> list[Gap]:
+        sf.write(str(path), _audio(seconds), RATE, subtype="PCM_16", format="FLAC")
+        return list(gaps)
+
+    return render
+
+
 def test_episode_files_and_hash(tmp_path, sa_rules):
     e = _episode()
     clip_start = e.start - timedelta(seconds=30)
-    d = write_episode(tmp_path, e, _audio(64), RATE, clip_start, "USB mic", sa_rules, "yamnet")
+    d = write_episode(tmp_path, e, _render(64), RATE, clip_start, "USB mic", sa_rules, "yamnet")
     assert d == tmp_path / "episodes" / e.id
     meta = json.loads((d / "metadata.json").read_text())
     flac = (d / "audio.flac").read_bytes()
@@ -43,14 +55,16 @@ def test_episode_files_and_hash(tmp_path, sa_rules):
     assert meta["audio"]["format"] == "FLAC"
     assert meta["detector"] == {"model": "yamnet", "confidence_threshold": 0.7}
     assert meta["device"] == "USB mic"
-    assert meta["bark_count_estimated"] == 1
+    assert meta["barking_bursts_estimated"] == 1
+    assert meta["audio"]["gaps"] == []
+    assert meta["audio"]["complete"] is True
     assert len(meta["windows"]) == len(e.windows)
     assert not list((tmp_path / "episodes").glob("*.tmp"))
 
 
 def test_episode_rewrite_is_noop(tmp_path, sa_rules):
     e = _episode()
-    args = (tmp_path, e, _audio(5), RATE, e.start, "USB mic", sa_rules, "yamnet")
+    args = (tmp_path, e, _render(5), RATE, e.start, "USB mic", sa_rules, "yamnet")
     d = write_episode(*args)
     before = (d / "audio.flac").read_bytes()
     write_episode(*args)
@@ -95,3 +109,14 @@ def test_backlog_sidecar(tmp_path):
         "sample_rate": RATE,
     }
     assert os.path.getsize(p) > 0
+
+
+def test_episode_records_gaps(tmp_path, sa_rules):
+    e = _episode()
+    gap = (T0, T0 + timedelta(seconds=2))
+    d = write_episode(tmp_path, e, _render(10, [gap]), RATE, e.start, "mic", sa_rules, "yamnet")
+    meta = json.loads((d / "metadata.json").read_text())
+    assert meta["audio"]["gaps"] == [
+        {"start": "2026-11-08T12:00:00Z", "end": "2026-11-08T12:00:02Z", "seconds": 2.0}
+    ]
+    assert meta["audio"]["complete"] is False

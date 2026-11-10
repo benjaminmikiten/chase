@@ -15,6 +15,7 @@ import hashlib
 import json
 import os
 import shutil
+from collections.abc import Callable
 from dataclasses import asdict
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -42,10 +43,21 @@ def _write_json_atomic(path: Path, data: dict[str, Any]) -> None:
     os.replace(tmp, path)
 
 
+Gap = tuple[datetime, datetime]
+
+
+def _sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for block in iter(lambda: f.read(1 << 20), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
 def write_episode(
     outbox: Path,
     episode: Episode,
-    audio: np.ndarray,
+    render: Callable[[Path], list[Gap]],
     rate: int,
     clip_start: datetime,
     device_label: str,
@@ -60,8 +72,8 @@ def write_episode(
     tmp.mkdir(parents=True)
 
     flac = tmp / "audio.flac"
-    sf.write(str(flac), audio, rate, subtype="PCM_16", format="FLAC")
-    duration = audio.size / rate
+    gaps = render(flac)  # streams the clip to disk; never holds a long episode in memory
+    duration = sf.info(str(flac)).frames / rate
     meta = {
         "schema_version": SCHEMA_VERSION,
         "episode_id": episode.id,
@@ -70,7 +82,7 @@ def write_episode(
         "clip_start": iso(clip_start),
         "clip_end": iso(clip_start + timedelta(seconds=duration)),
         "barking_seconds": episode.barking_seconds,
-        "bark_count_estimated": episode.bark_count,
+        "barking_bursts_estimated": episode.bark_count,
         "longest_gap_seconds": episode.longest_gap_seconds,
         "mean_loudness_dbfs": episode.mean_loudness_dbfs,
         "merged_from": episode.merged_from,
@@ -90,7 +102,12 @@ def write_episode(
             "format": "FLAC",
             "sample_rate": rate,
             "duration_seconds": duration,
-            "sha256": hashlib.sha256(flac.read_bytes()).hexdigest(),
+            "sha256": _sha256(flac),
+            "complete": not gaps,
+            "gaps": [
+                {"start": iso(a), "end": iso(b), "seconds": round((b - a).total_seconds(), 3)}
+                for a, b in gaps
+            ],
         },
     }
     (tmp / "metadata.json").write_text(json.dumps(meta, indent=2, sort_keys=True))

@@ -114,3 +114,47 @@ def test_spool_segment_names_sort_by_time(tmp_path, seconds):
     sp.flush()
     names = sorted(p.name for p in tmp_path.glob("*.flac"))
     assert names[0].startswith("20261108T120000")
+
+
+def test_write_clip_streams_and_reports_gaps(tmp_path):
+    sp = Spool(tmp_path / "spool", RATE, segment_seconds=60)
+    sig = ramp(10)
+    sp.write(T0, sig)
+    sp.flush()
+    out = tmp_path / "clip.flac"
+    gaps = sp.write_clip(out, T0 - timedelta(seconds=5), T0 + timedelta(seconds=15))
+    data, rate = __import__("soundfile").read(str(out), dtype="float32")
+    assert rate == RATE and data.size == 20 * RATE
+    np.testing.assert_allclose(data[5 * RATE : 15 * RATE], sig, atol=1 / 32768)
+    assert gaps == [
+        (T0 - timedelta(seconds=5), T0),
+        (T0 + timedelta(seconds=10), T0 + timedelta(seconds=15)),
+    ]
+
+
+def test_write_clip_reads_in_bounded_chunks(tmp_path, monkeypatch):
+    sp = Spool(tmp_path / "spool", RATE, segment_seconds=60)
+    sp.write(T0, ramp(1))
+    sp.flush()
+    seen = []
+    real = sp._extract
+
+    def spy(start, end):
+        seen.append((end - start).total_seconds())
+        return real(start, end)
+
+    monkeypatch.setattr(sp, "_extract", spy)
+    sp.write_clip(tmp_path / "c.flac", T0, T0 + timedelta(minutes=5), chunk_seconds=60)
+    assert len(seen) == 5 and max(seen) <= 60
+
+
+def test_unreadable_segment_becomes_gap(tmp_path):
+    sp = Spool(tmp_path / "spool", RATE, segment_seconds=60)
+    sig = ramp(120)
+    for i in range(0, sig.size, RATE):  # 1 s blocks -> two 60 s segments
+        sp.write(T0 + timedelta(seconds=i / RATE), sig[i : i + RATE])
+    sp.flush()
+    first = sorted((tmp_path / "spool").glob("*.flac"))[0]
+    first.write_bytes(b"not a flac file")
+    gaps = sp.write_clip(tmp_path / "c.flac", T0, T0 + timedelta(seconds=120))
+    assert gaps == [(T0, T0 + timedelta(seconds=60))]
