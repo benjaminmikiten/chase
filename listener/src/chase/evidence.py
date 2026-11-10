@@ -63,6 +63,7 @@ def write_episode(
     device_label: str,
     rules: RuleConfig,
     model_name: str,
+    timezone: str = "UTC",
 ) -> Path:
     final = outbox / "episodes" / episode.id
     if final.exists():
@@ -96,6 +97,7 @@ def write_episode(
             for w in episode.windows
         ],
         "device": device_label,
+        "clock": {"source": "system clock (NTP-synced)", "timezone": timezone},
         "detector": {"model": model_name, "confidence_threshold": rules.confidence_threshold},
         "audio": {
             "file": "audio.flac",

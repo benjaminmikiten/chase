@@ -186,6 +186,7 @@ class Service:
                     self.s.device_label,
                     self.rules,
                     self.model_name,
+                    timezone=self.s.timezone,
                 )
             except Exception:
                 logger.exception("writing episode %s failed", e.id)

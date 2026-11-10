@@ -1,0 +1,1971 @@
+{
+  "audio": {
+    "complete": false,
+    "duration_seconds": 2.0,
+    "file": "audio.flac",
+    "format": "FLAC",
+    "gaps": [
+      {
+        "end": "2026-11-09T04:18:14Z",
+        "seconds": 12.0,
+        "start": "2026-11-09T04:18:02Z"
+      }
+    ],
+    "sample_rate": 16000,
+    "sha256": "e5dd0980eb493254b5f0eb2b3417accfc5dc651726f5eb2ddd1c78dd402cffe3"
+  },
+  "barking_bursts_estimated": 322,
+  "barking_seconds": 309.12,
+  "clip_end": "2026-11-09T04:14:34Z",
+  "clip_start": "2026-11-09T04:14:32Z",
+  "clock": {
+    "source": "system clock (NTP-synced)",
+    "timezone": "America/Chicago"
+  },
+  "detector": {
+    "confidence_threshold": 0.7,
+    "model": "yamnet.tflite"
+  },
+  "device": "USB microphone (synthetic)",
+  "end": "2026-11-09T04:41:47.960000Z",
+  "episode_id": "ep-20261109T041502Z",
+  "longest_gap_seconds": 4.04,
+  "mean_loudness_dbfs": -24.5,
+  "merged_from": 1,
+  "schema_version": 1,
+  "start": "2026-11-09T04:15:02Z",
+  "windows": [
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:15:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:15:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:15:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:15:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:15:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:15:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:15:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:15:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:15:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:15:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:15:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:15:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:15:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:15:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:15:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:15:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:15:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:15:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:15:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:15:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:15:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:15:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:15:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:15:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:16:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:16:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:16:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:16:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:16:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:16:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:16:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:16:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:16:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:16:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:16:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:16:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:16:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:16:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:16:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:16:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:16:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:16:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:16:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:16:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:16:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:16:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:16:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:16:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:17:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:17:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:17:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:17:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:17:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:17:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:17:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:17:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:17:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:17:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:17:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:17:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:17:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:17:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:17:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:17:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:17:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:17:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:17:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:17:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:17:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:17:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:17:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:17:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:18:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:18:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:18:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:18:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:18:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:18:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:18:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:18:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:18:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:18:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:18:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:18:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:18:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:18:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:18:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:18:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:18:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:18:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:18:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:18:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:18:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:18:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:18:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:18:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:19:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:19:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:19:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:19:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:19:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:19:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:19:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:19:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:19:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:19:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:19:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:19:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:19:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:19:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:19:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:19:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:19:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:19:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:19:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:19:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:19:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:19:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:19:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:19:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:20:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:20:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:20:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:20:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:20:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:20:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:20:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:20:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:20:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:20:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:20:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:20:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:20:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:20:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:20:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:20:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:20:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:20:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:20:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:20:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:20:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:20:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:20:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:20:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:21:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:21:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:21:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:21:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:21:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:21:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:21:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:21:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:21:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:21:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:21:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:21:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:21:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:21:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:21:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:21:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:21:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:21:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:21:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:21:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:21:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:21:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:21:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:21:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:22:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:22:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:22:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:22:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:22:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:22:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:22:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:22:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:22:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:22:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:22:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:22:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:22:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:22:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:22:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:22:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:22:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:22:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:22:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:22:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:22:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:22:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:22:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:22:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:23:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:23:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:23:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:23:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:23:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:23:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:23:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:23:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:23:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:23:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:23:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:23:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:23:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:23:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:23:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:23:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:23:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:23:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:23:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:23:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:23:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:23:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:23:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:23:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:24:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:24:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:24:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:24:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:24:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:24:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:24:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:24:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:24:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:24:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:24:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:24:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:24:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:24:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:24:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:24:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:24:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:24:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:24:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:24:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:24:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:24:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:24:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:24:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:25:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:25:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:25:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:25:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:25:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:25:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:25:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:25:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:25:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:25:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:25:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:25:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:25:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:25:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:25:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:25:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:25:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:25:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:25:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:25:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:25:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:25:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:25:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:25:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:26:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:26:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:26:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:26:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:26:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:26:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:26:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:26:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:26:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:26:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:26:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:26:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:26:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:26:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:26:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:26:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:26:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:26:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:26:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:26:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:26:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:26:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:26:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:26:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:27:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:27:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:27:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:27:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:27:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:27:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:27:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:27:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:27:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:27:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:27:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:27:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:27:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:27:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:27:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:27:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:27:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:27:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:27:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:27:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:27:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:27:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:27:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:27:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:28:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:28:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:28:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:28:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:28:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:28:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:28:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:28:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:28:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:28:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:28:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:28:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:28:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:28:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:28:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:28:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:28:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:28:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:28:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:28:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:28:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:28:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:28:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:28:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:29:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:29:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:29:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:29:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:29:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:29:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:29:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:29:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:29:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:29:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:29:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:29:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:29:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:29:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:29:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:29:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:29:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:29:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:29:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:29:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:29:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:29:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:29:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:29:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:30:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:30:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:30:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:30:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:30:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:30:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:30:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:30:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:30:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:30:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:30:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:30:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:30:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:30:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:30:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:30:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:30:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:30:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:30:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:30:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:30:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:30:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:30:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:30:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:31:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:31:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:31:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:31:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:31:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:31:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:31:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:31:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:31:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:31:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:31:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:31:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:31:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:31:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:31:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:31:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:31:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:31:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:31:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:31:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:31:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:31:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:31:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:31:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:32:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:32:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:32:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:32:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:32:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:32:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:32:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:32:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:32:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:32:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:32:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:32:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:32:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:32:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:32:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:32:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:32:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:32:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:32:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:32:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:32:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:32:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:32:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:32:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:33:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:33:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:33:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:33:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:33:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:33:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:33:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:33:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:33:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:33:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:33:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:33:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:33:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:33:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:33:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:33:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:33:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:33:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:33:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:33:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:33:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:33:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:33:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:33:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:34:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:34:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:34:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:34:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:34:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:34:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:34:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:34:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:34:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:34:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:34:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:34:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:34:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:34:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:34:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:34:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:34:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:34:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:34:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:34:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:34:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:34:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:34:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:34:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:35:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:35:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:35:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:35:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:35:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:35:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:35:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:35:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:35:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:35:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:35:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:35:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:35:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:35:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:35:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:35:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:35:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:35:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:35:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:35:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:35:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:35:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:35:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:35:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:36:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:36:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:36:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:36:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:36:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:36:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:36:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:36:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:36:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:36:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:36:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:36:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:36:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:36:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:36:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:36:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:36:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:36:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:36:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:36:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:36:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:36:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:36:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:36:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:37:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:37:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:37:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:37:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:37:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:37:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:37:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:37:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:37:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:37:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:37:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:37:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:37:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:37:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:37:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:37:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:37:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:37:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:37:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:37:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:37:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:37:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:37:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:37:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:38:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:38:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:38:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:38:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:38:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:38:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:38:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:38:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:38:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:38:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:38:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:38:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:38:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:38:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:38:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:38:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:38:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:38:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:38:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:38:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:38:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:38:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:38:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:38:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:39:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:39:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:39:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:39:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:39:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:39:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:39:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:39:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:39:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:39:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:39:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:39:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:39:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:39:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:39:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:39:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:39:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:39:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:39:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:39:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:39:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:39:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:39:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:39:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:40:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:40:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:40:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:40:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:40:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:40:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:40:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:40:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:40:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:40:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:40:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:40:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:40:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:40:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:40:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:40:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:40:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:40:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:40:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:40:47Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:40:52.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:40:52Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:40:57.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:40:57Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:41:02.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:41:02Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:41:07.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:41:07Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:41:12.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:41:12Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:41:17.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:41:17Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:41:22.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:41:22Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:41:27.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:41:27Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:41:32.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:41:32Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:41:37.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:41:37Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:41:42.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:41:42Z"
+    },
+    {
+      "confidence": 0.88,
+      "end": "2026-11-09T04:41:47.960000Z",
+      "loudness_dbfs": -24.5,
+      "start": "2026-11-09T04:41:47Z"
+    }
+  ]
+}
