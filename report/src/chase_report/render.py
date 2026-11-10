@@ -112,8 +112,8 @@ def timeline_svg(meta: EpisodeMeta, width: int = 700, height: int = 46) -> str:
     for g in meta.gaps:
         x0, x1 = x(g.start), x(g.end)
         parts.append(
-            f'<rect class="gap" x="{x0}" y="4" width="{max(x1 - x0, 1.5)}" height="22" '
-            f'fill="#555" fill-opacity="0.45"/>'
+            f'<rect class="gap" x="{x0}" y="1" width="{max(x1 - x0, 3.0)}" height="28" '
+            f'fill="#222" stroke="#f1c40f" stroke-width="1"/>'
         )
     for frac, anchor in ((0.0, "start"), (0.5, "middle"), (1.0, "end")):
         t = meta.start + (meta.end - meta.start) * frac

@@ -87,7 +87,7 @@
   {% for e in v.episodes %}
   <h3>Episode {{ e.number }} timeline · {{ e.date_local }}, {{ e.start_local }} to {{ e.end_local }}</h3>
   {{ e.timeline_svg|safe }}
-  <div class="small">Red: barking detected. Grey hatching: no audio recorded.</div>
+  <div class="small">Red: barking detected. Black (outlined): no audio recorded.</div>
   {% endfor %}
 
   <h2>Barking by hour · {{ v.day.strftime("%A, %B ") ~ v.day.day }}</h2>
