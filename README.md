@@ -40,7 +40,7 @@ city as a preset in `config/presets/`.
 
 | Metric | Meaning |
 |---|---|
-| `chase_barking_windows_total`, `chase_barks_total` | barking windows; estimated barks (bursts) |
+| `chase_barking_windows_total`, `chase_barks_total` | barking windows; estimated **barking bursts** (not individual barks; see ADR 0002) |
 | `chase_current_run_seconds`, `chase_seconds_until_episode` | barking in progress |
 | `chase_episodes_total`, `chase_violations_total`, `chase_episodes_in_window` | rule outcomes |
 | `chase_barks_this_hour`, `chase_typical_barks_this_hour`, `chase_barks_today`, `chase_daily_average_barks`, `chase_heatmap_barks` | 30-day baselines (computed locally) |

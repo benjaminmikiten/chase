@@ -7,10 +7,12 @@ services:
     build: ./listener
     image: chase-listener:local
     restart: unless-stopped
+    init: true               # forward SIGTERM so the listener flushes its audio spool on stop
+    stop_grace_period: 30s
     devices:
       - /dev/snd:/dev/snd
     group_add:
-      - audio
+      - audio                # must match the host's audio group; see docs/running-on-the-optiplex.md
     volumes:
       - ./config:/config:ro
       - chase-data:/data

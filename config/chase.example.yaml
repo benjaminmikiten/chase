@@ -5,7 +5,8 @@ rules:
   # max_gap_seconds: 45
   # min_loudness_dbfs: -35     # optional loudness gate (off by default)
 
-audio_device: null             # null = system default; or a name/index from `arecord -l`
+audio_device: USB              # REQUIRED: part of the mic's name (see `arecord -l`); the default
+                               # input is usually the built-in jack, not your USB mic
 capture_rate: 48000            # must be a multiple of 16000
 timezone: America/Chicago
 device_label: USB microphone   # printed in evidence metadata

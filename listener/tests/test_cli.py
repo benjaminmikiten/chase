@@ -77,3 +77,10 @@ def test_replay_missing_db_is_friendly(tmp_path, capsys):
     cfg.write_text(f"rules:\n  preset: san-antonio\ndata_dir: {tmp_path / 'none'}\n")
     assert main(["replay", "--config", str(cfg), "--presets", str(PRESETS)]) == 0
     assert "0 episodes, 0 violations" in capsys.readouterr().out
+
+
+def test_run_requires_audio_device(tmp_path, capsys):
+    cfg = tmp_path / "chase.yaml"
+    cfg.write_text(f"rules:\n  preset: san-antonio\ndata_dir: {tmp_path}\n")
+    assert main(["run", "--config", str(cfg), "--presets", str(PRESETS)]) == 2
+    assert "audio_device" in capsys.readouterr().err

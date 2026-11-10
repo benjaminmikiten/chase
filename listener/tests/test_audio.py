@@ -99,10 +99,12 @@ def test_capture_reads_blocks(monkeypatch):
             pass
 
     monkeypatch.setattr(audio_mod.sd, "InputStream", FakeStream)
-    cap = Capture(RATE, None)
+    cap = Capture(RATE, None, clock=lambda: T0)
     cap.start()
     block = cap.read(timeout=0.1)
-    assert block is not None and block.shape == (1600,)
+    assert block is not None and block.samples.shape == (1600,)
+    assert block.start == T0 - timedelta(seconds=0.1)  # callback time minus block length
+    assert block.overflow is False
     assert cap.read(timeout=0.01) is None
     cap.stop()
 

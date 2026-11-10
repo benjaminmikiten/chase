@@ -20,7 +20,19 @@ arecord -l
 # card 2: Device [USB Audio Device], device 0: USB Audio [USB Audio]
 ```
 
-Use the card name or index as `audio_device` (or leave `null` for the system default).
+Set `audio_device` to **part of the mic's name** (for example `USB`). It's required: the
+system default is usually the OptiPlex's built-in input, which would record silence while
+looking healthy. Don't use the `arecord` card number, because sounddevice numbers devices
+differently. A name also keeps working if the mic is re-plugged and renumbered.
+
+Check that the host's `audio` group matches the container's (GID 29 on Debian-based images):
+
+```bash
+getent group audio    # audio:x:29:...
+```
+
+If the GID differs, replace `audio` under `group_add` in `compose.yaml` with the host's
+numeric GID (for example `- "63"`), or the listener won't be able to open the mic.
 
 ## 3. Configure
 
@@ -42,6 +54,9 @@ docker compose logs -f listener      # JSON events: listener_started, episode, v
 curl -s localhost:9100/metrics | grep chase_   # only if you publish the port; or:
 docker compose exec listener curl -s localhost:9100/metrics | grep chase_heartbeat
 ```
+
+If the mic is unplugged, the listener keeps retrying, with `chase_audio_errors_total{reason="capture"}`
+counting each attempt, and picks the mic back up when it returns.
 
 Quick check: play a dog-bark video near the mic. `chase_barking_windows_total` should rise,
 and backlog clips should appear:
@@ -78,4 +93,9 @@ When you like a result, put those thresholds in `config/chase.yaml` and
 | `/data/spool/` | last ~2 h of audio, 1-min FLAC segments | no |
 | `/data/outbox/episodes/<id>/` | episode FLAC (30 s pre/post-roll) + metadata.json | Plan 2 uploads it |
 | `/data/outbox/violations/<id>/rev-N.json` | violation manifests | Plan 2 uploads it |
-| `/data/backlog/` | short clips of every barking window, kept 90 days (for the v2 classifier) | no |
+| `/data/backlog/YYYY-MM-DD/` | one short clip per barking burst (max 5 s, plus one per minute of a long burst), kept 90 days for the v2 classifier | no |
+
+Each episode's `metadata.json` lists any stretch with no recorded audio (`audio.gaps`, with
+`audio.complete: false`), for example from a restart in the middle of a bout. Missing audio is
+never passed off as silence. `docker compose stop` gives the listener 30 s to flush its
+buffered audio.

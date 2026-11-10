@@ -104,8 +104,8 @@
     {
       "id": 2,
       "type": "stat",
-      "title": "Barks this hour",
-      "description": "Estimated barks this local hour vs the 30-day average for this hour.",
+      "title": "Barking bursts this hour",
+      "description": "Estimated barking bursts this local hour vs the 30-day average for this hour.",
       "datasource": {
         "type": "prometheus",
         "uid": "${prom}"
@@ -315,7 +315,7 @@
     {
       "id": 5,
       "type": "timeseries",
-      "title": "Barks per hour, last 24 h",
+      "title": "Barking bursts per hour, last 24 h",
       "datasource": {
         "type": "prometheus",
         "uid": "${prom}"
@@ -336,7 +336,7 @@
             "uid": "${prom}"
           },
           "expr": "increase(chase_barks_total[1h])",
-          "legendFormat": "barks",
+          "legendFormat": "bursts",
           "format": "time_series"
         },
         {
@@ -441,14 +441,14 @@
             "includeByName": {
               "start": true,
               "duration_seconds": true,
-              "bark_count_estimated": true,
-              "violation_id": true
+              "violation_id": true,
+              "barking_bursts_estimated": true
             },
             "renameByName": {
               "start": "When",
               "duration_seconds": "Length (s)",
-              "bark_count_estimated": "Est. barks",
-              "violation_id": "Violation (report triggered)"
+              "violation_id": "Violation (report triggered)",
+              "barking_bursts_estimated": "Est. bursts"
             }
           }
         }
@@ -535,7 +535,7 @@
     {
       "id": 8,
       "type": "table",
-      "title": "When does it bark? (avg barks by weekday \u00d7 hour, last 30 days)",
+      "title": "When does it bark? (avg barking bursts by weekday \u00d7 hour, last 30 days)",
       "datasource": {
         "type": "prometheus",
         "uid": "${prom}"

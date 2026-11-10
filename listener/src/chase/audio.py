@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import queue
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -22,19 +23,39 @@ _BLOCK_SECONDS = 0.1
 _NAME_FORMAT = "%Y%m%dT%H%M%S.%fZ"
 
 
-class Capture:
-    """Mono float32 blocks from a sounddevice input stream."""
+@dataclass(frozen=True)
+class CaptureBlock:
+    start: datetime  # wall-clock time of the first sample (system clock, NTP-synced)
+    samples: np.ndarray
+    overflow: bool  # the driver reported dropped input before this block
 
-    def __init__(self, rate: int, device: str | int | None):
+
+def _utc_now() -> datetime:
+    return datetime.now(UTC)
+
+
+class Capture:
+    """Mono float32 blocks from a sounddevice input stream, stamped with wall-clock time.
+
+    The timestamp is taken in the audio callback (not when the block is read), so a slow
+    consumer never makes blocks look late.
+    """
+
+    def __init__(
+        self, rate: int, device: str | int | None, clock: Callable[[], datetime] = _utc_now
+    ):
         self.rate = rate
         self.device = device
-        self._queue: queue.Queue[np.ndarray] = queue.Queue()
+        self.clock = clock
+        self._queue: queue.Queue[CaptureBlock] = queue.Queue()
         self._stream: sd.InputStream | None = None
 
     def _callback(self, indata: np.ndarray, frames: int, time, status) -> None:
+        overflow = bool(status and getattr(status, "input_overflow", False))
         if status:
             logger.warning("audio status: %s", status)
-        self._queue.put(indata[:, 0].copy())
+        start = self.clock() - timedelta(seconds=frames / self.rate)
+        self._queue.put(CaptureBlock(start, indata[:, 0].copy(), overflow))
 
     def start(self) -> None:
         self._stream = sd.InputStream(
@@ -47,7 +68,7 @@ class Capture:
         )
         self._stream.start()
 
-    def read(self, timeout: float = 2.0) -> np.ndarray | None:
+    def read(self, timeout: float = 2.0) -> CaptureBlock | None:
         try:
             return self._queue.get(timeout=timeout)
         except queue.Empty:
@@ -55,9 +76,11 @@ class Capture:
 
     def stop(self) -> None:
         if self._stream is not None:
-            self._stream.stop()
-            self._stream.close()
-            self._stream = None
+            try:
+                self._stream.stop()
+                self._stream.close()
+            finally:
+                self._stream = None
 
 
 class Windower:
@@ -70,6 +93,10 @@ class Windower:
         self.t0 = t0
         self._buf = np.zeros(0, dtype=np.float32)
         self._consumed = 0  # samples dropped from the front of _buf since t0
+
+    def shift(self, seconds: float) -> None:
+        """Move all future window timestamps by `seconds` (clock re-anchoring)."""
+        self.t0 += timedelta(seconds=seconds)
 
     def _at(self, sample: int) -> datetime:
         return self.t0 + timedelta(seconds=sample / self.rate)

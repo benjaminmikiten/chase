@@ -4,6 +4,9 @@ from __future__ import annotations
 
 import argparse
 import logging
+import signal
+import sys
+import threading
 from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -62,7 +65,8 @@ def replay(settings: Settings, preset: Path | None, since: date | None, until: d
     for e in episodes:
         print(
             f"  episode {e.id}: {_fmt(e.start, tz)} - {_fmt(e.end, tz)}, "
-            f"{e.duration_seconds / 60:.1f} min, ~{e.bark_count} barks, merged_from={e.merged_from}"
+            f"{e.duration_seconds / 60:.1f} min, {e.barking_seconds / 60:.1f} min barking, "
+            f"~{e.bark_count} bursts, merged_from={e.merged_from}"
         )
     for v in violations:
         print(f"  violation {v.id} (rev {v.revision}): {', '.join(v.episode_ids)}")
@@ -70,24 +74,41 @@ def replay(settings: Settings, preset: Path | None, since: date | None, until: d
     return 0
 
 
-def run(settings: Settings) -> int:  # pragma: no cover - needs real audio hardware
+def run(settings: Settings) -> int:
+    if settings.audio_device is None:
+        print(
+            "audio_device must be set in chase.yaml (a name from `python -m sounddevice` or "
+            "`arecord -l`, e.g. 'USB'). The system default is usually the built-in input, "
+            "not your USB mic.",
+            file=sys.stderr,
+        )
+        return 2
     from chase.audio import Capture, Spool
     from chase.detector import BarkDetector
     from chase.events import emit
     from chase.metrics import Metrics
     from chase.service import Service
 
+    stop = threading.Event()
+    for sig in (signal.SIGTERM, signal.SIGINT):
+        signal.signal(sig, lambda *_: stop.set())
+
     metrics = Metrics()
     metrics.serve(settings.metrics_port)
+    log = BarkLog(settings.data_dir / "chase.sqlite")
     service = Service(
         settings,
-        BarkLog(settings.data_dir / "chase.sqlite"),
+        log,
         BarkDetector(settings.model_path, settings.class_map_path),
         Spool(settings.data_dir / "spool", settings.capture_rate),
         metrics,
     )
     emit("listener_started", rules=settings.rules.name, capture_rate=settings.capture_rate)
-    service.run(Capture(settings.capture_rate, settings.audio_device))
+    try:
+        service.run(Capture(settings.capture_rate, settings.audio_device), stop=stop)
+    finally:
+        log.close()
+        emit("listener_stopped")
     return 0
 
 
@@ -97,4 +118,4 @@ def main(argv: list[str] | None = None) -> int:
     settings = load_settings(args.config, args.presets)
     if args.command == "replay":
         return replay(settings, args.preset, args.since, args.until)
-    return run(settings)  # pragma: no cover
+    return run(settings)

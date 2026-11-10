@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import logging
 import shutil
+import threading
+import time
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from statistics import fmean
@@ -17,7 +19,7 @@ from zoneinfo import ZoneInfo
 
 import numpy as np
 
-from chase.audio import Capture, Spool, Windower, spool_keep_after
+from chase.audio import Capture, CaptureBlock, Spool, Windower, spool_keep_after
 from chase.baselines import compute_baselines, hourly_history
 from chase.config import Settings
 from chase.detector import loudness_dbfs, to_16k
@@ -33,6 +35,8 @@ logger = logging.getLogger(__name__)
 TICK_SECONDS = 10.0
 BASELINE_EVERY = timedelta(minutes=10)
 MAX_TIMEOUTS_BEFORE_RESTART = 30
+CLOCK_CORRECT_SECONDS = 0.25
+CLOCK_JUMP_SECONDS = 2.0
 BACKLOG_CLIP = timedelta(seconds=5)
 BACKLOG_EVERY = timedelta(seconds=60)
 _VIOLATION_LOOKBACK = timedelta(hours=48)
@@ -71,6 +75,9 @@ class Service:
         self._last_baseline: datetime | None = None
         # Backlog clips are cut for bursts that end after this point (history is skipped).
         self._backlog_cursor = clock()
+        self._t0: datetime | None = None
+        self._written = 0
+        self._windower: Windower | None = None
         metrics.episodes_per_window.set(self.rules.episodes_per_window)
 
     # -- per window ---------------------------------------------------------------------------
@@ -78,13 +85,14 @@ class Service:
     def on_window(
         self, start: datetime, end: datetime, audio_16k: np.ndarray, audio_native: np.ndarray
     ) -> None:
-        self.metrics.heartbeat.set(self.clock().timestamp())
         try:
             score = self.detector.score(audio_16k)
         except Exception:
             logger.exception("inference failed")
             self.metrics.audio_errors.labels(reason="inference").inc()
             return
+        # Only after a successful score: a broken model must stop the heartbeat too.
+        self.metrics.heartbeat.set(self.clock().timestamp())
         if score < self.rules.confidence_threshold:
             return
         loudness = loudness_dbfs(audio_native)
@@ -310,38 +318,107 @@ class Service:
 
     # -- blocking loop ------------------------------------------------------------------------
 
-    def run(self, capture: Capture) -> None:  # pragma: no cover - needs real audio hardware
+    def process_block(self, block: CaptureBlock) -> None:
+        """Stamp a captured block, spool it, and score any windows it completes.
+
+        Timestamps come from the sample count (sample-accurate within a stretch) but are
+        re-anchored to the system clock whenever they drift: small drift (mic crystal error)
+        shifts the anchor in place; a jump (dropped audio, USB hiccup, capture restart) starts
+        a fresh anchor and window stream.
+        """
         rate = self.s.capture_rate
-        capture.start()
-        t0 = self.clock()
-        windower = Windower(rate, self.s.window_seconds, self.s.hop_seconds, t0)
-        written = 0
+        if block.overflow:
+            self.metrics.audio_errors.labels(reason="overflow").inc()
+        derived = self._t0 + timedelta(seconds=self._written / rate) if self._t0 else None
+        drift = (block.start - derived).total_seconds() if derived else 0.0
+        if self._windower is None or abs(drift) > CLOCK_JUMP_SECONDS:
+            if self._windower is not None:
+                self.metrics.clock_corrections.inc()
+                emit("clock_reanchored", kind="jump", seconds=round(drift, 3))
+            self._t0, self._written = block.start, 0
+            self._windower = Windower(rate, self.s.window_seconds, self.s.hop_seconds, block.start)
+        elif abs(drift) > CLOCK_CORRECT_SECONDS:
+            self._t0 = self._t0 + timedelta(seconds=drift) if self._t0 else block.start
+            self._windower.shift(drift)
+            self.metrics.clock_corrections.inc()
+            emit("clock_reanchored", kind="drift", seconds=round(drift, 3))
+
+        assert self._t0 is not None
+        try:
+            self.spool.write(self._t0 + timedelta(seconds=self._written / rate), block.samples)
+        except Exception:
+            logger.exception("spool write failed")
+            self.metrics.audio_errors.labels(reason="spool").inc()
+        self._written += block.samples.size
+        for start, end, native in self._windower.push(block.samples):
+            self.on_window(start, end, to_16k(native, rate), native)
+
+    def safe_tick(self) -> None:
+        try:
+            self.tick()
+        except Exception:
+            logger.exception("tick failed")
+            self.metrics.audio_errors.labels(reason="tick").inc()
+            return
+        self.metrics.last_tick_success.set(self.clock().timestamp())
+
+    def _start_capture(
+        self, capture: Capture, stop: threading.Event, sleep: Callable[[float], None]
+    ) -> bool:
+        """Start the mic, retrying with backoff (1 s doubling to 30 s). False if stopped."""
+        backoff = 1.0
+        while not stop.is_set():
+            try:
+                capture.start()
+                return True
+            except Exception as e:
+                logger.warning("audio capture failed to start: %s", e)
+                self.metrics.audio_errors.labels(reason="capture").inc()
+                emit("capture_error", reason=f"start failed: {e}")
+                sleep(backoff)
+                backoff = min(backoff * 2, 30.0)
+        return False
+
+    def _stop_capture(self, capture: Capture) -> None:
+        try:
+            capture.stop()
+        except Exception:
+            logger.exception("audio capture failed to stop cleanly")
+
+    def run(
+        self,
+        capture: Capture,
+        stop: threading.Event | None = None,
+        sleep: Callable[[float], None] = time.sleep,
+    ) -> None:
+        """The blocking loop. Returns when `stop` is set (SIGTERM), after flushing the spool."""
+        stop = stop or threading.Event()
+        if not self._start_capture(capture, stop, sleep):
+            return
         timeouts = 0
         last_tick = self.clock()
-        while True:
-            block = capture.read()
-            if block is None:
-                timeouts += 1
-                self.on_capture_timeout()
-                if timeouts >= MAX_TIMEOUTS_BEFORE_RESTART:
-                    logger.warning("restarting audio capture after %d timeouts", timeouts)
-                    capture.stop()
-                    capture.start()
-                    t0, written, timeouts = self.clock(), 0, 0
-                    windower = Windower(rate, self.s.window_seconds, self.s.hop_seconds, t0)
-            else:
-                timeouts = 0
-                try:
-                    self.spool.write(t0 + timedelta(seconds=written / rate), block)
-                except Exception:
-                    logger.exception("spool write failed")
-                    self.metrics.audio_errors.labels(reason="spool").inc()
-                written += block.size
-                for start, end, native in windower.push(block):
-                    self.on_window(start, end, to_16k(native, rate), native)
-            if (self.clock() - last_tick).total_seconds() >= TICK_SECONDS:
-                last_tick = self.clock()
-                try:
-                    self.tick()
-                except Exception:
-                    logger.exception("tick failed")
+        try:
+            while not stop.is_set():
+                block = capture.read()
+                if block is None:
+                    timeouts += 1
+                    self.on_capture_timeout()
+                    if timeouts >= MAX_TIMEOUTS_BEFORE_RESTART:
+                        logger.warning("restarting audio capture after %d timeouts", timeouts)
+                        self._stop_capture(capture)
+                        self._windower = None  # next block starts a fresh anchor
+                        timeouts = 0
+                        if not self._start_capture(capture, stop, sleep):
+                            break
+                else:
+                    timeouts = 0
+                    self.process_block(block)
+                if (self.clock() - last_tick).total_seconds() >= TICK_SECONDS:
+                    last_tick = self.clock()
+                    self.safe_tick()
+        finally:
+            self._stop_capture(capture)
+            try:
+                self.spool.flush()
+            except Exception:
+                logger.exception("spool flush on shutdown failed")
