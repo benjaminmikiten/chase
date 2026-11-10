@@ -65,6 +65,23 @@ def count_bursts(windows: Sequence[BarkWindow], hop_seconds: float) -> int:
     return 1 + sum(1 for gap in _gaps(ws) if gap > hop_seconds)
 
 
+def bursts(windows: Sequence[BarkWindow], hop_seconds: float) -> list[list[BarkWindow]]:
+    """Group windows into bursts: maximal sequences separated by at most one hop."""
+    ws = _normalize(windows)
+    out: list[list[BarkWindow]] = []
+    if not ws:
+        return out
+    current = [ws[0]]
+    for w, gap in zip(ws[1:], _gaps(ws), strict=True):
+        if gap > hop_seconds:
+            out.append(current)
+            current = [w]
+        else:
+            current.append(w)
+    out.append(current)
+    return out
+
+
 def _barking_seconds(windows: list[BarkWindow]) -> float:
     total = 0.0
     seg_start, seg_end = windows[0].start, windows[0].end

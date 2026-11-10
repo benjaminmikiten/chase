@@ -94,8 +94,9 @@ def test_backlog_prune_90_days(tmp_path):
     old = write_backlog_clip(tmp_path, now - timedelta(days=91), _audio(1), RATE, 0.9, -20.0)
     new = write_backlog_clip(tmp_path, now - timedelta(days=89), _audio(1), RATE, 0.9, -20.0)
     assert old.exists() and old.with_suffix(".json").exists()
+    assert old.parent.name == "2026-08-09"  # date folders, so pruning removes whole days
     assert prune_backlog(tmp_path, now, 90) == 1
-    assert not old.exists() and not old.with_suffix(".json").exists()
+    assert not old.parent.exists()
     assert new.exists()
 
 

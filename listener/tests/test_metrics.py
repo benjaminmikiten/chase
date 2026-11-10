@@ -22,6 +22,9 @@ PINNED = [
     "chase_heatmap_barks",
     "chase_outbox_pending",
     "chase_heartbeat_timestamp_seconds",
+    "chase_data_free_bytes",
+    "chase_last_tick_success_timestamp_seconds",
+    "chase_clock_corrections_total",
     "chase_bark_confidence",
     "chase_bark_loudness_dbfs",
 ]

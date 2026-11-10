@@ -13,7 +13,7 @@ class Metrics:
         self.barking_windows = Counter(
             "chase_barking_windows", "Audio windows classified as barking", registry=r
         )
-        self.barks = Counter("chase_barks", "Estimated barks (bursts)", registry=r)
+        self.barks = Counter("chase_barks", "Estimated barking bursts", registry=r)
         self.episodes = Counter("chase_episodes", "Finalized barking episodes", registry=r)
         self.violations = Counter("chase_violations", "New violations", registry=r)
         self.audio_errors = Counter("chase_audio_errors", "Errors by stage", ["reason"], registry=r)
@@ -52,6 +52,17 @@ class Metrics:
         )
         self.heartbeat = Gauge(
             "chase_heartbeat_timestamp_seconds", "Last time audio was processed", registry=r
+        )
+        self.data_free = Gauge("chase_data_free_bytes", "Free space on the data volume", registry=r)
+        self.last_tick_success = Gauge(
+            "chase_last_tick_success_timestamp_seconds",
+            "Last time the rules/evidence tick completed",
+            registry=r,
+        )
+        self.clock_corrections = Counter(
+            "chase_clock_corrections",
+            "Times audio timestamps were re-anchored to the system clock",
+            registry=r,
         )
         self.confidence = Histogram(
             "chase_bark_confidence",

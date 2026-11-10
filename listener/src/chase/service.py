@@ -8,8 +8,10 @@ nothing and duplicates nothing.
 from __future__ import annotations
 
 import logging
+import shutil
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
+from statistics import fmean
 from typing import Protocol
 from zoneinfo import ZoneInfo
 
@@ -23,7 +25,7 @@ from chase.events import emit
 from chase.evidence import iso, prune_backlog, write_backlog_clip, write_episode, write_violation
 from chase.metrics import Metrics
 from chase.model import BarkWindow, Episode, RunStatus, Violation
-from chase.rules import assign_violations, current_run, finalized, find_episodes
+from chase.rules import assign_violations, bursts, current_run, finalized, find_episodes
 from chase.store import BarkLog
 
 logger = logging.getLogger(__name__)
@@ -31,6 +33,8 @@ logger = logging.getLogger(__name__)
 TICK_SECONDS = 10.0
 BASELINE_EVERY = timedelta(minutes=10)
 MAX_TIMEOUTS_BEFORE_RESTART = 30
+BACKLOG_CLIP = timedelta(seconds=5)
+BACKLOG_EVERY = timedelta(seconds=60)
 _VIOLATION_LOOKBACK = timedelta(hours=48)
 
 
@@ -65,6 +69,8 @@ class Service:
         self.model_name = settings.model_path.name
         self._last_bark_end = log.last_window_end()
         self._last_baseline: datetime | None = None
+        # Backlog clips are cut for bursts that end after this point (history is skipped).
+        self._backlog_cursor = clock()
         metrics.episodes_per_window.set(self.rules.episodes_per_window)
 
     # -- per window ---------------------------------------------------------------------------
@@ -97,13 +103,6 @@ class Service:
             self.metrics.barks.inc()
         self.metrics.confidence.observe(score)
         self.metrics.loudness.observe(loudness)
-        try:
-            write_backlog_clip(
-                self.backlog, start, audio_native, self.s.capture_rate, score, loudness
-            )
-        except Exception:
-            logger.exception("backlog clip failed")
-            self.metrics.audio_errors.labels(reason="evidence").inc()
 
     def on_capture_timeout(self) -> None:
         # The heartbeat only advances in on_window, so a dead mic stops it (alerting watches it).
@@ -132,6 +131,7 @@ class Service:
         self._update_gauges(now, run, violations)
         final_ids = {e.id for e in final}
         pending_start = min((e.start for e in episodes if e.id not in final_ids), default=None)
+        self._write_backlog(windows, now)
         self._prune(now, run, pending_start)
         if self._last_baseline is None or now - self._last_baseline >= BASELINE_EVERY:
             self._refresh_baselines(now)
@@ -267,10 +267,45 @@ class Service:
             logger.exception("spool prune failed")
             self.metrics.audio_errors.labels(reason="spool").inc()
 
+    def _write_backlog(self, windows: list[BarkWindow], now: datetime) -> None:
+        """One short clip per finished burst (plus one per minute of a long burst), local only.
+
+        Clips come from the spool, so they never duplicate overlapping windows' audio.
+        """
+        settle = timedelta(seconds=self.s.hop_seconds + 1.0)
+        for burst in bursts(
+            [w for w in windows if w.start >= self._backlog_cursor], self.s.hop_seconds
+        ):
+            end = max(w.end for w in burst)
+            if now - end < settle:
+                break  # still going; later bursts are newer still
+            t = burst[0].start
+            while t < end:
+                clip_end = min(end, t + BACKLOG_CLIP)
+                part = [w for w in burst if t <= w.start < clip_end] or burst
+                try:
+                    write_backlog_clip(
+                        self.backlog,
+                        t,
+                        self.spool.extract(t, clip_end),
+                        self.s.capture_rate,
+                        max(w.confidence for w in part),
+                        fmean(w.loudness_dbfs for w in part),
+                    )
+                except Exception:
+                    logger.exception("backlog clip failed")
+                    self.metrics.audio_errors.labels(reason="evidence").inc()
+                t += BACKLOG_EVERY
+            self._backlog_cursor = end
+
     def _refresh_baselines(self, now: datetime) -> None:
         bursts = self.log.burst_starts_between(now - timedelta(days=31), now + timedelta(seconds=1))
         self.metrics.apply_baselines(compute_baselines(bursts, now, self.tz))
         prune_backlog(self.backlog, now, self.s.backlog_days)
+        try:
+            self.metrics.data_free.set(shutil.disk_usage(self.s.data_dir).free)
+        except OSError:
+            logger.exception("disk usage check failed")
         self._last_baseline = now
 
     # -- blocking loop ------------------------------------------------------------------------

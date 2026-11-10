@@ -147,8 +147,11 @@ def write_backlog_clip(
     confidence: float,
     loudness_dbfs: float,
 ) -> Path:
-    backlog_dir.mkdir(parents=True, exist_ok=True)
-    path = backlog_dir / f"{start.astimezone(UTC).strftime(_BACKLOG_NAME)}.flac"
+    """A short local-only clip for the future which-dog classifier, in a per-day folder."""
+    utc = start.astimezone(UTC)
+    day = backlog_dir / utc.strftime("%Y-%m-%d")
+    day.mkdir(parents=True, exist_ok=True)
+    path = day / f"{utc.strftime(_BACKLOG_NAME)}.flac"
     sf.write(str(path), audio, rate, subtype="PCM_16", format="FLAC")
     _write_json_atomic(
         path.with_suffix(".json"),
@@ -163,15 +166,17 @@ def write_backlog_clip(
 
 
 def prune_backlog(backlog_dir: Path, now: datetime, days: int) -> int:
-    cutoff = now - timedelta(days=days)
+    """Delete whole day folders older than `days`. Returns the number of clips removed."""
+    if not backlog_dir.exists():
+        return 0
+    cutoff = (now - timedelta(days=days)).astimezone(UTC).date()
     removed = 0
-    for p in backlog_dir.glob("*.flac"):
+    for day in backlog_dir.iterdir():
         try:
-            start = datetime.strptime(p.stem, _BACKLOG_NAME).replace(tzinfo=UTC)
+            d = datetime.strptime(day.name, "%Y-%m-%d").date()
         except ValueError:
             continue
-        if start < cutoff:
-            p.unlink(missing_ok=True)
-            p.with_suffix(".json").unlink(missing_ok=True)
-            removed += 1
+        if day.is_dir() and d < cutoff:
+            removed += sum(1 for _ in day.glob("*.flac"))
+            shutil.rmtree(day, ignore_errors=True)
     return removed

@@ -332,3 +332,30 @@ def test_failed_episode_write_is_retried_after_restart(make_rig, monkeypatch):
     ids = [e.id for e in rig2.log.episodes_between(T0 - timedelta(hours=1), T0 + timedelta(days=1))]
     assert ids == ["ep-20261108T120000Z", "ep-20261108T130000Z"]
     assert rig2.log.latest_violations(T0 - timedelta(days=1))[0].episode_ids == tuple(ids)
+
+
+def test_backlog_one_short_clip_per_burst(make_rig):
+    bursts = [(T0 + timedelta(seconds=s), T0 + timedelta(seconds=s + 3)) for s in (0, 6, 12)]
+    long_start = T0 + timedelta(seconds=30)
+    bursts.append((long_start, long_start + timedelta(seconds=130)))
+    rig = make_rig(bursts)
+    rig.service._backlog_cursor = T0 - timedelta(minutes=1)
+    block = np.full(RATE, 0.05, dtype=np.float32)
+    for s in range(-10, 200):
+        rig.spool.write(T0 + timedelta(seconds=s), block)
+    rig.feed(T0, 170)
+    rig.tick_at(T0 + timedelta(seconds=200))
+    clips = sorted((rig.settings.data_dir / "backlog").rglob("*.flac"))
+    # 3 short bursts -> 3 clips; the 130 s burst -> clips at +0, +60, +120 s.
+    assert len(clips) == 6
+    assert all(sf.info(str(c)).duration <= 5.0 + 1e-6 for c in clips)
+    rig.tick_at(T0 + timedelta(seconds=210))
+    assert len(sorted((rig.settings.data_dir / "backlog").rglob("*.flac"))) == 6
+
+
+def test_no_backlog_clip_per_window(make_rig):
+    rig = make_rig([(T0, T0 + timedelta(minutes=1))])
+    rig.feed(T0, 30)
+    assert not (rig.settings.data_dir / "backlog").exists() or not any(
+        (rig.settings.data_dir / "backlog").rglob("*.flac")
+    )
