@@ -98,7 +98,9 @@ def test_capture_reads_blocks(monkeypatch):
         def close(self):
             pass
 
-    monkeypatch.setattr(audio_mod.sd, "InputStream", FakeStream)
+    monkeypatch.setattr(
+        audio_mod, "_sounddevice", lambda: type("sd", (), {"InputStream": FakeStream})
+    )
     cap = Capture(RATE, None, clock=lambda: T0)
     cap.start()
     block = cap.read(timeout=0.1)
@@ -160,3 +162,14 @@ def test_unreadable_segment_becomes_gap(tmp_path):
     first.write_bytes(b"not a flac file")
     gaps = sp.write_clip(tmp_path / "c.flac", T0, T0 + timedelta(seconds=120))
     assert gaps == [(T0, T0 + timedelta(seconds=60))]
+
+
+def test_importing_audio_does_not_need_portaudio():
+    # sounddevice initializes PortAudio on import. That must happen at capture start (where it's
+    # retried and counted), not at import, or a missing audio server kills the process outright.
+    import subprocess
+    import sys
+
+    code = "import sys; sys.modules['sounddevice'] = None; import chase.audio, chase.service"
+    result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr

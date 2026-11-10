@@ -12,9 +12,9 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Any
 
 import numpy as np
-import sounddevice as sd
 import soundfile as sf
 
 logger = logging.getLogger(__name__)
@@ -28,6 +28,15 @@ class CaptureBlock:
     start: datetime  # wall-clock time of the first sample (system clock, NTP-synced)
     samples: np.ndarray
     overflow: bool  # the driver reported dropped input before this block
+
+
+def _sounddevice() -> Any:
+    """Import sounddevice lazily: importing it initializes PortAudio, which can fail (no audio
+    server, mic missing). At capture start that failure is retried and counted; at import time it
+    would kill the process."""
+    import sounddevice
+
+    return sounddevice
 
 
 def _utc_now() -> datetime:
@@ -48,7 +57,7 @@ class Capture:
         self.device = device
         self.clock = clock
         self._queue: queue.Queue[CaptureBlock] = queue.Queue()
-        self._stream: sd.InputStream | None = None
+        self._stream: Any = None
 
     def _callback(self, indata: np.ndarray, frames: int, time, status) -> None:
         overflow = bool(status and getattr(status, "input_overflow", False))
@@ -58,7 +67,7 @@ class Capture:
         self._queue.put(CaptureBlock(start, indata[:, 0].copy(), overflow))
 
     def start(self) -> None:
-        self._stream = sd.InputStream(
+        self._stream = _sounddevice().InputStream(
             samplerate=self.rate,
             channels=1,
             device=self.device,
