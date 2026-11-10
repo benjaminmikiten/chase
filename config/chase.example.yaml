@@ -1,0 +1,24 @@
+# Copy to config/chase.yaml (git-ignored) and adjust.
+rules:
+  preset: san-antonio          # file name in config/presets/, without .yaml
+  # Any rule key can be overridden here, e.g.:
+  # max_gap_seconds: 45
+  # min_loudness_dbfs: -35     # optional loudness gate (off by default)
+
+audio_device: USB              # REQUIRED: part of the mic's name (see `arecord -l`); the default
+                               # input is usually the built-in jack, not your USB mic
+capture_rate: 48000            # must be a multiple of 16000
+timezone: America/Chicago
+device_label: USB microphone   # printed in evidence metadata
+
+# Defaults you rarely need to change:
+# window_seconds: 0.96
+# hop_seconds: 0.48
+# pre_roll_seconds: 30
+# post_roll_seconds: 30
+# spool_minutes: 120
+# backlog_days: 90
+# data_dir: /data
+# model_path: /models/yamnet.tflite
+# class_map_path: /models/yamnet_class_map.csv
+# metrics_port: 9100

@@ -1,0 +1,44 @@
+# chase on the OptiPlex: the listener plus Grafana Alloy shipping metrics and logs to Grafana Cloud.
+#   cp config/chase.example.yaml config/chase.yaml   # then edit
+#   cp .env.example .env                              # then fill in Grafana Cloud credentials
+#   docker compose up -d
+services:
+  listener:
+    build: ./listener
+    image: chase-listener:local
+    restart: unless-stopped
+    init: true               # forward SIGTERM so the listener flushes its audio spool on stop
+    stop_grace_period: 30s
+    devices:
+      - /dev/snd:/dev/snd
+    group_add:
+      - ${AUDIO_GID:-audio}  # set AUDIO_GID in .env if the host's audio group isn't GID 29
+    volumes:
+      - ./config:/config:ro
+      - chase-data:/data
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:9100/metrics"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+
+  alloy:
+    image: grafana/alloy:v1.11.3
+    restart: unless-stopped
+    command: ["run", "--storage.path=/var/lib/alloy/data", "/etc/alloy/config.alloy"]
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - alloy-data:/var/lib/alloy/data
+    depends_on:
+      - listener
+
+volumes:
+  chase-data:
+  alloy-data:

@@ -25,3 +25,8 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .superpowers/
+
+# test artifacts
+.coverage
+.coverage.*
+htmlcov/

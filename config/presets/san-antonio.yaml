@@ -1,0 +1,22 @@
+# San Antonio, TX barking-dog preset.
+#
+# San Antonio's animal code (Chapter 5) bans letting animals create a noise disturbance but sets no
+# per-event duration. The episode definition (10 min, gaps < 30 s) follows Los Angeles practice.
+# The "two events in 24 hours" rule comes from a 2017 city draft of Chapter 5 and is UNVERIFIED
+# against the current code. Confirm with 311 before relying on it.
+name: san-antonio
+confidence_threshold: 0.7
+episode_min_minutes: 10
+max_gap_seconds: 30
+min_separation_minutes: 10
+episodes_per_window: 2
+violation_window_hours: 24
+addressee: "San Antonio Animal Care Services / 311"
+citation: >-
+  City of San Antonio Code of Ordinances, Chapter 5 (Animals). A 2017 city draft defines an animal
+  noise nuisance as "a minimum of two separate recorded noise events over a period of twenty-four
+  (24) hours."
+caveat: >-
+  The quoted ordinance wording is from a 2017 draft of Chapter 5 and is unverified against the
+  current code. San Antonio sets no per-event duration; this report defines an episode as at least
+  10 minutes of barking with no gap longer than 30 seconds, following Los Angeles practice.
