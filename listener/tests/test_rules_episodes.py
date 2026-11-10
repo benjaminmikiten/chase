@@ -107,3 +107,13 @@ def test_current_run_over_after_gap(sa_rules):
 
 def test_current_run_empty(sa_rules):
     assert current_run([], T0, sa_rules) is None
+
+
+def test_finalized_blocked_by_open_run_within_separation(sa_rules):
+    eps = find_episodes(make_windows(T0, 11 * MIN), sa_rules, HOP)
+    end = eps[0].end
+    open_start = end + timedelta(minutes=8)  # a new run began before end + min_separation
+    now = end + timedelta(minutes=10)
+    assert finalized(eps, now, sa_rules, open_run_start=open_start) == []
+    later = end + timedelta(minutes=11)  # run started after the separation window: no merge
+    assert finalized(eps, now, sa_rules, open_run_start=later) == eps

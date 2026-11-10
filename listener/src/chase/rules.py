@@ -117,10 +117,25 @@ def find_episodes(
     return episodes
 
 
-def finalized(episodes: Sequence[Episode], now: datetime, rules: RuleConfig) -> list[Episode]:
-    """Episodes that can no longer grow or merge with later barking."""
+def finalized(
+    episodes: Sequence[Episode],
+    now: datetime,
+    rules: RuleConfig,
+    open_run_start: datetime | None = None,
+) -> list[Episode]:
+    """Episodes that can no longer grow or merge with later barking.
+
+    An episode is final once the settle time has passed AND no run still in progress started
+    within `min_separation_minutes` of its end (that run could still qualify and merge).
+    """
     settle = timedelta(seconds=max(rules.max_gap_seconds, rules.min_separation_minutes * 60))
-    return [e for e in episodes if now - e.end >= settle]
+    separation = timedelta(minutes=rules.min_separation_minutes)
+    return [
+        e
+        for e in episodes
+        if now - e.end >= settle
+        and not (open_run_start is not None and e.end < open_run_start < e.end + separation)
+    ]
 
 
 def current_run(

@@ -115,24 +115,48 @@ class Service:
     def tick(self) -> None:
         now = self.clock()
         window = timedelta(hours=self.rules.violation_window_hours)
-        start = now - window - timedelta(hours=2)
-        last_ep = self.log.last_episode_end()
-        if last_ep is not None and last_ep > start:
-            start = last_ep
-        windows = self.log.windows_between(start, now + timedelta(seconds=1))
+        # Fixed lookback (not "since the last saved episode"): an episode whose write failed is
+        # retried on every tick, across restarts, until it ages out. IDs are deterministic, so
+        # re-finding saved episodes is a no-op.
+        cutoff = now - window - timedelta(hours=2)
+        windows = self.log.windows_between(cutoff, now + timedelta(seconds=1))
 
-        episodes = find_episodes(windows, self.rules, self.s.hop_seconds)
-        final = finalized(episodes, now, self.rules)
+        episodes = self._complete_episodes(
+            find_episodes(windows, self.rules, self.s.hop_seconds), cutoff, now
+        )
+        run = current_run(windows, now, self.rules)
+        final = finalized(episodes, now, self.rules, run.start if run else None)
         new_episodes = self._finalize_episodes(final)
         violations = self._update_violations(now)
         self._announce(new_episodes, violations)
-        run = current_run(windows, now, self.rules)
         self._update_gauges(now, run, violations)
         final_ids = {e.id for e in final}
         pending_start = min((e.start for e in episodes if e.id not in final_ids), default=None)
         self._prune(now, run, pending_start)
         if self._last_baseline is None or now - self._last_baseline >= BASELINE_EVERY:
             self._refresh_baselines(now)
+
+    def _complete_episodes(
+        self, episodes: list[Episode], cutoff: datetime, now: datetime
+    ) -> list[Episode]:
+        """Drop episodes the lookback may have cut short.
+
+        - One starting right at the cutoff may be the tail of a longer run.
+        - One overlapping an already-saved episode with a different ID is part of that
+          (earlier, longer or merged) episode.
+        """
+        margin = timedelta(seconds=self.rules.max_gap_seconds + self.s.window_seconds)
+        saved = [
+            e for e in self.log.episodes_between(cutoff - timedelta(days=2), now) if e.end >= cutoff
+        ]
+        out = []
+        for e in episodes:
+            if e.start < cutoff + margin:
+                continue
+            if any(s.id != e.id and s.start <= e.end and e.start <= s.end for s in saved):
+                continue
+            out.append(e)
+        return out
 
     def _finalize_episodes(self, final: list[Episode]) -> list[Episode]:
         saved: list[Episode] = []
