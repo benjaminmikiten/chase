@@ -77,3 +77,19 @@ def test_sender_from_json():
 def test_view_date_used_in_subject():
     v = view()
     assert v.day == date(2026, 11, 8)
+
+
+def test_test_manifest_subject_and_banner():
+    import json
+    from dataclasses import replace
+
+    from chase_report.model import Manifest
+
+    raw = json.loads((Path(__file__).parent / "fixtures" / "violation_manifest.json").read_text())
+    raw["test"] = True
+    assert Manifest.from_json(raw).test is True
+    v = replace(view(), test=True)
+    msg = compose(v, Path("/dev/null"), [], {}, SENDER, revision=1)
+    assert msg["Subject"].startswith("[TEST] Barking dog complaint")
+    body = msg.get_body(preferencelist=("plain",))
+    assert body is not None and "TEST REPORT" in body.get_content()

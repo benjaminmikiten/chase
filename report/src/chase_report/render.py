@@ -88,6 +88,7 @@ class ReportView:
     sender: Sender
     links: tuple[tuple[str, str], ...]
     timezone: str
+    test: bool = False
 
 
 def timeline_svg(meta: EpisodeMeta, width: int = 700, height: int = 46) -> str:
@@ -263,6 +264,7 @@ def build_view(
         sender=sender,
         links=tuple(links.items()),
         timezone=tzname,
+        test=m.test,
     )
 
 

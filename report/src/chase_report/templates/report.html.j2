@@ -30,6 +30,7 @@
 <body>
 
 <section class="letter">
+  {% if v.test %}<p class="caveat"><strong>TEST REPORT</strong>: generated from synthetic data. Do not forward.</p>{% endif %}
   <h1>{{ v.title }}</h1>
   <div class="meta">{{ v.report_date }} · Reference {{ v.reference }}</div>
 

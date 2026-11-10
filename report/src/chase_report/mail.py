@@ -56,7 +56,8 @@ def subject(view: ReportView, revision: int) -> str:
     d = view.day
     n = len(view.episodes)
     s = f"Barking dog complaint: {d:%b} {d.day}, {d.year} ({n} episode{'s' if n != 1 else ''})"
-    return s + (" (updated)" if revision > 1 else "")
+    s += " (updated)" if revision > 1 else ""
+    return f"[TEST] {s}" if view.test else s
 
 
 def compose(
@@ -77,6 +78,12 @@ def compose(
         body = (
             "This updated report replaces the earlier one for the same period; it adds the "
             "episodes recorded since.\n\n" + body
+        )
+
+    if view.test:
+        body = (
+            "*** TEST REPORT: generated from synthetic data by infra/send-test-violation.sh. "
+            "Do not forward. ***\n\n" + body
         )
 
     msg = EmailMessage()

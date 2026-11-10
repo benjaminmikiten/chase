@@ -125,6 +125,7 @@ class Manifest:
     episode_ids: tuple[str, ...]
     rule: Rule
     hourly_history: tuple[tuple[datetime, int], ...]
+    test: bool = False  # set only by infra/send-test-violation.sh
 
     @classmethod
     def from_json(cls, d: dict[str, Any]) -> Manifest:
@@ -151,4 +152,5 @@ class Manifest:
             hourly_history=tuple(
                 (_ts(h["hour_start"]), int(h["barks"])) for h in d["hourly_history"]
             ),
+            test=bool(d.get("test", False)),
         )
