@@ -103,7 +103,19 @@ def run(settings: Settings) -> int:
         Spool(settings.data_dir / "spool", settings.capture_rate),
         metrics,
     )
-    emit("listener_started", rules=settings.rules.name, capture_rate=settings.capture_rate)
+    from chase.uploader import build_uploader, run_forever
+
+    uploader = build_uploader(settings, metrics)
+    if uploader is not None:
+        threading.Thread(
+            target=run_forever, args=(uploader, settings, stop), name="uploader", daemon=True
+        ).start()
+    emit(
+        "listener_started",
+        rules=settings.rules.name,
+        capture_rate=settings.capture_rate,
+        upload=bool(uploader),
+    )
     try:
         service.run(Capture(settings.capture_rate, settings.audio_device), stop=stop)
     finally:

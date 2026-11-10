@@ -50,11 +50,15 @@ class Settings:
     class_map_path: Path = Path("/models/yamnet_class_map.csv")
     metrics_port: int = 9100
     device_label: str = "USB microphone"
+    gcs_bucket: str | None = None
+    gcs_credentials: Path = Path("/secrets/listener-key.json")
+    upload_interval_seconds: float = 30.0
+    uploaded_days: int = 30
 
 
 _RULE_KEYS = {f.name for f in fields(RuleConfig)}
 _SETTING_KEYS = {f.name for f in fields(Settings)} - {"rules"}
-_PATH_KEYS = {"data_dir", "model_path", "class_map_path"}
+_PATH_KEYS = {"data_dir", "model_path", "class_map_path", "gcs_credentials"}
 
 
 def _read_yaml(path: Path) -> dict[str, Any]:

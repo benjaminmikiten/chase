@@ -15,6 +15,7 @@ services:
       - ${AUDIO_GID:-audio}  # set AUDIO_GID in .env if the host's audio group isn't GID 29
     volumes:
       - ./config:/config:ro
+      - ./secrets:/secrets:ro    # a directory (may be empty): holds listener-key.json for cloud upload
       - chase-data:/data
     logging:
       driver: json-file

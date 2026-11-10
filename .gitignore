@@ -1,4 +1,5 @@
 # secrets & personal config — never commit
+secrets/
 .env
 *.env
 *-key.json
