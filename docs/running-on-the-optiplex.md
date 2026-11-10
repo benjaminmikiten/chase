@@ -44,7 +44,9 @@ cp .env.example .env                              # git-ignored
 - `config/chase.yaml`: set `audio_device`; keep `rules: {preset: san-antonio}` or override
   thresholds there.
 - `.env`: Grafana Cloud Prometheus and Loki URLs and users, plus an access-policy token with
-  `metrics:write` and `logs:write`.
+  `metrics:write` and `logs:write`. Use the **full push URLs**: the Prometheus one ends in
+  `/api/prom/push`, and for Loki you must append `/loki/api/v1/push` to the base URL shown on
+  the Details page (a `405 Method Not Allowed` from `loki.write` means it's missing).
 
 ## 4. Start
 
