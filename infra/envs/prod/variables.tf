@@ -43,3 +43,30 @@ variable "attachment_limit_mb" {
   type        = number
   default     = 15
 }
+
+# Optional: Grafana alert rules + dashboard as code (grafana.tf). Off by default, so plan/apply
+# need no Grafana credentials.
+variable "grafana_enabled" {
+  description = "Manage chase's Grafana alert rules and dashboard with Terraform."
+  type        = bool
+  default     = false
+}
+
+variable "grafana_url" {
+  description = "Grafana stack URL, e.g. https://<stack>.grafana.net"
+  type        = string
+  default     = ""
+}
+
+variable "grafana_auth" {
+  description = "Grafana service-account token with alerting + dashboards write. Pass via TF_VAR_grafana_auth, never in tfvars."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "grafana_prometheus_uid" {
+  description = "UID of the Prometheus data source that holds chase_* metrics (Connections -> Data sources)."
+  type        = string
+  default     = ""
+}
