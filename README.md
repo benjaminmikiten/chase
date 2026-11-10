@@ -7,7 +7,7 @@
 **Status:** Plan 1 (listener + dashboard) is built. Plan 2 (cloud upload, PDF report and email, alerting) is next.
 
 - Design: [`docs/superpowers/specs/2026-11-09-chase-design.md`](docs/superpowers/specs/2026-11-09-chase-design.md)
-- Run it: [`docs/running-on-the-optiplex.md`](docs/running-on-the-optiplex.md)
+- Run it: [`docs/running-on-the-optiplex.md`](docs/running-on-the-optiplex.md) (`make help` for everyday commands; `make install-cron` to auto-deploy from git)
 - Decisions: [`docs/adr/`](docs/adr/)
 
 ## How it works

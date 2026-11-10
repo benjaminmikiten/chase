@@ -12,7 +12,7 @@ services:
     devices:
       - /dev/snd:/dev/snd
     group_add:
-      - audio                # must match the host's audio group; see docs/running-on-the-optiplex.md
+      - ${AUDIO_GID:-audio}  # set AUDIO_GID in .env if the host's audio group isn't GID 29
     volumes:
       - ./config:/config:ro
       - chase-data:/data

@@ -31,8 +31,9 @@ Check that the host's `audio` group matches the container's (GID 29 on Debian-ba
 getent group audio    # audio:x:29:...
 ```
 
-If the GID differs, replace `audio` under `group_add` in `compose.yaml` with the host's
-numeric GID (for example `- "63"`), or the listener won't be able to open the mic.
+If the GID differs, set `AUDIO_GID=<number>` in `.env`, or the listener won't be able to open
+the mic. Don't edit `compose.yaml` itself: local edits to tracked files make auto-update
+refuse to run.
 
 ## 3. Configure
 
@@ -66,6 +67,38 @@ and backlog clips should appear:
 ```bash
 docker compose exec listener ls /data/backlog | tail
 ```
+
+## Everyday commands
+
+`make help` lists them (install make with `sudo apt install make` if it's missing):
+
+| Command | What it does |
+|---|---|
+| `make up` / `make down` / `make restart` | start, stop, restart after a config change |
+| `make status` / `make watch` | barking, episodes, and health metrics right now / live |
+| `make logs` | follow the listener's events |
+| `make backlog` / `make episodes` / `make violations` | what's been recorded |
+| `make replay SINCE=2026-11-01 PRESET=config/presets/x.yaml` | re-run the rules over history |
+| `make test-mic` | record 5 s from the mic and play it back |
+| `make deploy` | pull from git and redeploy now |
+
+## Auto-update from git
+
+```bash
+make install-cron     # every 15 minutes; CRON_SCHEDULE='*/5 * * * *' to change
+make cron-log         # recent runs
+make uninstall-cron
+```
+
+`deploy/auto-update.sh` fetches the branch you have checked out. If there's a new commit, it
+fast-forwards and runs `docker compose up -d --build`. It does nothing when nothing changed. It
+refuses (and logs why) if tracked files have local edits or if the remote history was
+rewritten, and it never discards anything. `config/chase.yaml` and `.env` are git-ignored, so
+your settings never block it. Your user needs to be in the `docker` group for cron to run
+compose.
+
+Whatever lands on that branch deploys within 15 minutes, so push only what you want running.
+Once PR #14 is merged, switch the OptiPlex to `main` (`git checkout main`) so it follows main.
 
 ## 5. Dashboard
 
