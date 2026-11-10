@@ -1,0 +1,21 @@
+To: {{ v.addressee }}
+Re: Barking dog noise complaint ({{ v.reference }})
+Date: {{ v.report_date }}
+
+I am reporting repeated, sustained dog barking {{ v.source_line }}.
+
+{{ v.headline }}
+
+{% for e in v.episodes %}
+  {{ e.number }}. {{ e.date_local }}, {{ e.start_local }} to {{ e.end_local }} ({{ e.duration }}): {{ e.barking_minutes }} minutes of barking, about {{ e.bursts }} barking bursts{% if e.audio_status != "complete" %} [recording {{ e.audio_status }}]{% endif %}
+
+{% endfor %}
+
+{{ v.rule_text }} Every episode was recorded; the recordings are attached or linked below, and the attached PDF details the times, the recordings and how they were made.
+
+I would appreciate your help resolving this.
+
+Sincerely,
+{{ v.sender.name }}
+{{ v.sender.address }}
+{{ v.sender.phone }}
