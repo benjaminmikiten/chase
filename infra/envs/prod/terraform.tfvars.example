@@ -1,0 +1,21 @@
+# Copy to terraform.tfvars (git-ignored) and fill in. Never commit real values.
+project_id  = "your-chase-project-id"
+alert_email = "you@example.com"
+
+# Set to true (and apply) only AFTER CI has deployed the real report image:
+# report_push_enabled = true
+
+# Optional:
+# region              = "us-central1"
+# github_repository   = "your-github-user/chase"
+# attachment_limit_mb = 15
+# report_ingress      = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+
+# Set to true (and apply) only AFTER CI has deployed the real report image:
+# report_push_enabled = true
+
+# Optional: Grafana alert rules + dashboard (see grafana.tf). Put the token in the environment:
+#   export TF_VAR_grafana_auth=glsa_...
+# grafana_enabled        = true
+# grafana_url            = "https://<stack>.grafana.net"
+# grafana_prometheus_uid = "<prometheus data source uid>"

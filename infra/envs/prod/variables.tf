@@ -1,0 +1,78 @@
+variable "project_id" {
+  description = "GCP project ID for chase (its own project; not shared)."
+  type        = string
+}
+
+variable "region" {
+  description = "Region for Cloud Run, the bucket, Pub/Sub and Artifact Registry."
+  type        = string
+  default     = "us-central1"
+}
+
+variable "github_repository" {
+  description = "GitHub repository (owner/name) allowed to deploy via Workload Identity Federation."
+  type        = string
+  default     = "benjaminmikiten/chase"
+}
+
+variable "ci_branch" {
+  description = "Git ref the CI service account may be impersonated from."
+  type        = string
+  default     = "refs/heads/main"
+}
+
+variable "alert_email" {
+  description = "Where Cloud Monitoring alerts (report failures, dead letters) are emailed."
+  type        = string
+}
+
+variable "report_image" {
+  description = "Initial image for the report service. CI deploys real images afterwards (Terraform ignores later image changes)."
+  type        = string
+  default     = "us-docker.pkg.dev/cloudrun/container/hello"
+}
+
+variable "report_ingress" {
+  description = "Cloud Run ingress for the report service. Internal-only admits Pub/Sub push from this project; if the morning TEST report shows push being rejected, set INGRESS_TRAFFIC_ALL (IAM still allows only the push service account)."
+  type        = string
+  default     = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+}
+
+variable "report_push_enabled" {
+  description = "Deliver violation notifications to the report service. Leave false until CI has deployed the real report image (the initial placeholder would ack and drop them); messages are retained meanwhile."
+  type        = bool
+  default     = false
+}
+
+variable "attachment_limit_mb" {
+  description = "Email attachment budget in base64-encoded MB. Over it, audio is linked instead of attached."
+  type        = number
+  default     = 15
+}
+
+# Optional: Grafana alert rules + dashboard as code (grafana.tf). Off by default, so plan/apply
+# need no Grafana credentials.
+variable "grafana_enabled" {
+  description = "Manage chase's Grafana alert rules and dashboard with Terraform."
+  type        = bool
+  default     = false
+}
+
+variable "grafana_url" {
+  description = "Grafana stack URL, e.g. https://<stack>.grafana.net"
+  type        = string
+  default     = ""
+}
+
+variable "grafana_auth" {
+  description = "Grafana service-account token with alerting + dashboards write. Pass via TF_VAR_grafana_auth, never in tfvars."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "grafana_prometheus_uid" {
+  description = "UID of the Prometheus data source that holds chase_* metrics (Connections -> Data sources)."
+  type        = string
+  default     = ""
+}

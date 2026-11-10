@@ -18,7 +18,7 @@
 [YAMNet](https://www.kaggle.com/models/google/yamnet) audio model, and charts it on a Grafana
 dashboard. When the barking crosses a configurable noise-ordinance threshold, it keeps the
 recordings and builds the case for you: timestamps, durations, fingerprinted audio, and (soon) a
-ready-to-forward complaint.
+ready-to-forward complaint ([sample PDF](docs/samples/sample-report.pdf), synthetic data).
 
 City animal services usually want **recordings of repeated, sustained barking**, not a
 neighbor's impression of it. Getting those by hand means being awake, home, and holding a phone at
@@ -44,7 +44,7 @@ exactly the wrong moments. `chase` does it all day, every day, on a spare comput
 | | What | State |
 |---|---|---|
 | **Plan 1** | Listener, rules, local evidence outbox, Grafana dashboard, Docker deployment | ✅ running on real hardware |
-| **Plan 2** | Upload evidence to Google Cloud Storage; generate the complaint letter + evidence-packet PDF; email it to you, ready to forward; alerting | 🚧 next |
+| **Plan 2** | Upload evidence to Google Cloud Storage; generate the complaint letter + evidence-packet PDF; email it to you, ready to forward; alerting | 🔧 built, needs one-time cloud setup ([infra/README.md](infra/README.md)) |
 | **v2** | "Which dog is this?" classifier trained on locally kept clips | 🗓️ later |
 
 ## How it works
@@ -224,6 +224,8 @@ A few decisions that keep the evidence honest
 
 ```
 listener/          Python package `chase` (uv) + Dockerfile
+report/            Python package `chase_report`: the Cloud Run report service (PDF + email)
+infra/             Terraform (envs/prod), bootstrap wizard, IAM smoke test
   src/chase/       config · detector · audio · rules (pure) · store · baselines · evidence ·
                    metrics · events · service (the loop) · cli
   tests/           pytest: synthetic audio only, no network, no real mic
@@ -253,9 +255,10 @@ task, and an ADR for any decision a future reader would question. The design liv
 ## Roadmap
 
 - [x] Listener, rules, replay, evidence outbox, dashboard, Docker deployment, auto-update
-- [ ] **Plan 2:** Terraform'd Google Cloud project (scale-to-zero Cloud Run, GCS, Secret Manager,
-      keyless CI), outbox uploader, complaint letter + evidence-packet PDF, ready-to-forward email,
-      "listener went silent" alerts
+- [x] **Plan 2 (code):** Terraform'd Google Cloud project (scale-to-zero Cloud Run, GCS, Pub/Sub,
+      Secret Manager, keyless CI), outbox uploader, complaint letter + evidence-packet PDF,
+      ready-to-forward email, cloud alerts
+- [ ] Plan 2 setup on the real project ([morning checklist](infra/README.md#morning-checklist-first-time-setup))
 - [ ] Count individual barks, not just bursts ([#13](https://github.com/benjaminmikiten/chase/issues/13))
 - [ ] v2: "which dog is this?" classifier, with a labeling screen
 - [ ] Maybe: phone push when a bout passes 10 minutes; durable share links for evidence

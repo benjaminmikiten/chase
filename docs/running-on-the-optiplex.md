@@ -100,6 +100,24 @@ compose.
 Whatever lands on that branch deploys within 15 minutes, so push only what you want running.
 Once PR #14 is merged, switch the OptiPlex to `main` (`git checkout main`) so it follows main.
 
+## Cloud evidence (Plan 2)
+
+Once the cloud side is set up (see [infra/README.md](../infra/README.md)):
+
+```bash
+mkdir -p ~/chase/secrets
+# from the machine where you ran infra/bootstrap.sh:
+#   scp secrets/listener-key.json wizard@orb:~/chase/secrets/listener-key.json
+nano config/chase.yaml        # add:  gcs_bucket: <your-project>-chase-evidence
+make restart
+make logs                     # listener_started ... "upload": true
+```
+
+From then on, every episode and violation manifest is uploaded within about 30 seconds and moved
+from `/data/outbox/` to `/data/sent/` (kept 30 days). A violation becomes a report email in your
+inbox. If uploads fail (network, key), the listener keeps listening, counts
+`chase_audio_errors_total{reason="upload"}`, and retries.
+
 ## 5. Dashboard
 
 Grafana Cloud -> Dashboards -> New -> Import -> upload `grafana/dashboard.json`, then pick your

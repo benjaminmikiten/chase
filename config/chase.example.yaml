@@ -11,6 +11,10 @@ capture_rate: 48000            # must be a multiple of 16000
 timezone: America/Chicago
 device_label: USB microphone   # printed in evidence metadata
 
+# Cloud evidence upload (Plan 2). Leave unset to keep evidence on this machine only.
+# gcs_bucket: your-project-chase-evidence
+# gcs_credentials: /secrets/listener-key.json   # ./secrets/ on the host, mounted read-only
+
 # Defaults you rarely need to change:
 # window_seconds: 0.96
 # hop_seconds: 0.48

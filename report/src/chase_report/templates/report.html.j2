@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ v.title }} · {{ v.reference }}</title>
+<style>
+  @page { size: Letter; margin: 0.8in 0.85in;
+          @bottom-right { content: "{{ v.reference }} · page " counter(page) " of " counter(pages);
+                          font: 8pt Helvetica, Arial, sans-serif; color: #888; } }
+  body { font: 10.5pt/1.5 Georgia, "DejaVu Serif", serif; color: #111; }
+  h1, h2, h3, .meta, table, .small, .badge { font-family: Helvetica, Arial, "DejaVu Sans", sans-serif; }
+  h1 { font-size: 17pt; margin: 0 0 2pt; }
+  h2 { font-size: 13pt; margin: 18pt 0 6pt; border-bottom: 1px solid #ddd; padding-bottom: 3pt; }
+  h3 { font-size: 10.5pt; margin: 12pt 0 3pt; }
+  .meta { color: #555; font-size: 9pt; margin-bottom: 16pt; }
+  table { width: 100%; border-collapse: collapse; font-size: 8.8pt; margin: 6pt 0 10pt; }
+  th, td { text-align: left; padding: 4pt 5pt; border-bottom: 1px solid #e3e3e3; vertical-align: top; }
+  th { background: #f4f4f4; font-weight: 600; }
+  .small { font-size: 8.5pt; color: #555; }
+  .mono { font-family: "DejaVu Sans Mono", Menlo, monospace; font-size: 7.6pt; word-break: break-all; }
+  .sig { margin-top: 26pt; }
+  .badge { display: inline-block; background: #c0392b; color: #fff; padding: 1pt 6pt; border-radius: 3pt;
+           font-size: 8.5pt; vertical-align: middle; }
+  .caveat { background: #fff8e5; border-left: 3px solid #e6a700; padding: 6pt 9pt; font-size: 9pt; }
+  .packet { page-break-before: always; }
+  .incomplete { color: #a04000; font-weight: 600; }
+  svg { display: block; margin: 2pt 0 4pt; }
+</style>
+</head>
+<body>
+
+<section class="letter">
+  {% if v.test %}<p class="caveat"><strong>TEST REPORT</strong>: generated from synthetic data. Do not forward.</p>{% endif %}
+  <h1>{{ v.title }}</h1>
+  <div class="meta">{{ v.report_date }} · Reference {{ v.reference }}</div>
+
+  <p>To: {{ v.addressee }}</p>
+
+  <p>I am reporting repeated, sustained dog barking {{ v.source_line }}.</p>
+
+  <p><strong>{{ v.headline }}</strong></p>
+
+  <table>
+    <tr><th>#</th><th>Date</th><th>Start</th><th>End</th><th>Duration</th><th>Barking (min)</th><th>Est. barking bursts</th></tr>
+    {% for e in v.episodes %}
+    <tr><td>{{ e.number }}</td><td>{{ e.date_local }}</td><td>{{ e.start_local }}</td><td>{{ e.end_local }}</td>
+        <td>{{ e.duration }}</td><td>{{ e.barking_minutes }}</td><td>{{ e.bursts }}</td></tr>
+    {% endfor %}
+  </table>
+
+  <p>{{ v.rule_text }} Every episode was recorded. The recordings are attached to or linked from
+  the email that accompanies this report, and the following pages detail the times, the recordings
+  and how they were made.</p>
+
+  <p>I would appreciate your help resolving this.</p>
+
+  <div class="sig">
+    Sincerely,<br>
+    {{ v.sender.name }}<br>
+    {{ v.sender.address }}<br>
+    {{ v.sender.phone }}
+  </div>
+</section>
+
+<section class="packet">
+  <h1>Barking Evidence Report <span class="badge">{{ v.episodes|length }} episodes · {{ v.total_barking_minutes }} min</span></h1>
+  <div class="meta">Reference {{ v.reference }} · times in {{ v.timezone }}</div>
+
+  <h2>Rule applied</h2>
+  <p>{{ v.rule_text }}</p>
+  <p class="small">{{ v.citation }}</p>
+  <div class="caveat">{{ v.caveat }}</div>
+
+  <h2>Episodes</h2>
+  <table>
+    <tr><th>#</th><th>Start</th><th>End</th><th>Duration</th><th>Barking (min)</th><th>Est. barking bursts</th>
+        <th>Longest pause</th><th>Mean level</th><th>Recording</th></tr>
+    {% for e in v.episodes %}
+    <tr><td>{{ e.number }}</td><td>{{ e.date_local }}<br>{{ e.start_local }}</td><td>{{ e.end_local }}</td>
+        <td>{{ e.duration }}</td><td>{{ e.barking_minutes }}</td><td>{{ e.bursts }}</td><td>{{ e.longest_gap }}</td>
+        <td>{{ e.loudness }}</td>
+        <td{% if e.audio_status != "complete" %} class="incomplete"{% endif %}>{{ e.audio_status }}</td></tr>
+    {% endfor %}
+  </table>
+  <p class="small">"Barking bursts" are estimated runs of continuous barking, not a count of each individual bark;
+  barking minutes is the measured quantity.</p>
+
+  {% for e in v.episodes %}
+  <h3>Episode {{ e.number }} timeline · {{ e.date_local }}, {{ e.start_local }} to {{ e.end_local }}</h3>
+  {{ e.timeline_svg|safe }}
+  <div class="small">Red: barking detected. Black (outlined): no audio recorded.</div>
+  {% endfor %}
+
+  <h2>Barking by hour · {{ v.day.strftime("%A, %B ") ~ v.day.day }}</h2>
+  {{ v.hourly_svg|safe }}
+  <div class="small">Bars: barking bursts in each hour of this day. Dashed line: the average for that
+  hour over the preceding days. Red bars are more than twice the usual level.</div>
+
+  <h2>Recording details</h2>
+  <table>
+    {% for k, val in v.recording %}<tr><th style="width:22%">{{ k }}</th><td>{{ val }}</td></tr>{% endfor %}
+  </table>
+
+  <h3>File fingerprints (SHA-256)</h3>
+  <p class="small">Any change to a recording changes its fingerprint. These identify the exact files
+  provided with this report.</p>
+  <table>
+    <tr><th style="width:12%">Episode</th><th>FLAC (original)</th><th>MP3 (copy)</th></tr>
+    {% for e in v.episodes %}
+    <tr><td>{{ e.number }}</td><td class="mono">{{ e.flac_sha }}</td><td class="mono">{{ e.mp3_sha }}</td></tr>
+    {% endfor %}
+  </table>
+</section>
+
+</body>
+</html>
