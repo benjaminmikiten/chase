@@ -29,7 +29,7 @@ RUN useradd --system --uid 1000 --gid audio --create-home chase \
  && mkdir -p /data && chown chase:audio /data
 USER chase
 VOLUME ["/data"]
-EXPOSE 9100
+EXPOSE 9100 8080
 
 ENTRYPOINT ["chase"]
 CMD ["run", "--config", "/config/chase.yaml", "--presets", "/config/presets"]

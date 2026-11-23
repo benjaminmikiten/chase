@@ -13,6 +13,8 @@ services:
       - /dev/snd:/dev/snd
     group_add:
       - ${AUDIO_GID:-audio}  # set AUDIO_GID in .env if the host's audio group isn't GID 29
+    ports:
+      - "${CHASE_UI_PORT:-8080}:8080"  # live page (no login: anyone on your network can see it)
     volumes:
       - ./config:/config:ro
       - chase-data:/data

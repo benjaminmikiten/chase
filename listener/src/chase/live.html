@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>chase · live</title>
+<style>
+  :root {
+    --bg: #111418; --card: #1a1f26; --text: #e8ebef; --muted: #8b95a3; --track: #2a313b;
+    --barking: #ff5a4e; --paused: #f2b33d; --quiet: #3ecf8e; --off: #6b7684;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg: #f3f5f8; --card: #fff; --text: #14181d; --muted: #5d6772; --track: #e2e6ec; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center;
+    background: var(--bg); color: var(--text);
+    font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main {
+    width: min(560px, 100% - 2rem); padding: 2rem; border-radius: 20px; background: var(--card);
+    box-shadow: 0 1px 3px rgb(0 0 0 / .15); text-align: center;
+    --accent: var(--off);
+  }
+  main[data-state="barking"] { --accent: var(--barking); }
+  main[data-state="paused"] { --accent: var(--paused); }
+  main[data-state="quiet"] { --accent: var(--quiet); }
+  .state { display: inline-flex; align-items: center; gap: .6rem; font-size: 1.6rem; font-weight: 650; }
+  .dot { width: 1rem; height: 1rem; border-radius: 50%; background: var(--accent); }
+  main[data-state="barking"] .dot { animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .3; transform: scale(.8); } }
+  @media (prefers-reduced-motion: reduce) { main[data-state="barking"] .dot { animation: none; } }
+  .big {
+    margin: .75rem 0 .25rem; font-size: clamp(3.5rem, 18vw, 6rem); font-weight: 700;
+    font-variant-numeric: tabular-nums; letter-spacing: -.02em; line-height: 1;
+  }
+  .big.small { font-size: clamp(1.8rem, 9vw, 2.6rem); }
+  .sub { color: var(--muted); min-height: 1.4em; }
+  .progress { margin-top: 1.75rem; text-align: left; }
+  .progress[hidden] { display: none; }
+  .bar { height: .7rem; border-radius: 1rem; background: var(--track); overflow: hidden; }
+  .fill { height: 100%; width: 0; background: var(--accent); transition: width .4s linear; }
+  .progress p { margin: .5rem 0 0; color: var(--muted); font-size: .95rem; }
+  footer { margin-top: 1.75rem; color: var(--muted); font-size: .8rem; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<main data-state="no_audio">
+  <div class="state"><span class="dot"></span><span id="state">Connecting…</span></div>
+  <div class="big" id="big">–</div>
+  <div class="sub" id="sub"></div>
+  <section class="progress" id="progress" hidden>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <p id="progress-text"></p>
+  </section>
+  <footer id="footer"></footer>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const main = document.querySelector("main");
+
+function clock(s) {
+  s = Math.max(0, Math.floor(s));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  const pad = (n) => String(n).padStart(2, "0");
+  return h ? `${h}:${pad(m)}:${pad(sec)}` : `${m}:${pad(sec)}`;
+}
+function ago(s) {
+  if (s < 60) return `${Math.round(s)} s ago`;
+  if (s < 3600) return `${Math.round(s / 60)} min ago`;
+  if (s < 86400) { const h = Math.floor(s / 3600), m = Math.round((s % 3600) / 60); return m ? `${h} h ${m} min ago` : `${h} h ago`; }
+  return `${Math.round(s / 86400)} days ago`;
+}
+const time = (iso) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+
+function render(d) {
+  main.dataset.state = d.state;
+  const run = d.run, r = d.rules;
+  const big = $("big");
+  big.classList.remove("small");
+
+  if (d.state === "no_audio") {
+    $("state").textContent = "Not hearing audio";
+    big.textContent = "–";
+    $("sub").textContent = d.seconds_since_audio == null
+      ? "The listener hasn't scored any audio yet."
+      : `Nothing scored for ${ago(d.seconds_since_audio).replace(" ago", "")}. Check the mic.`;
+  } else if (run) {
+    $("state").textContent = d.state === "barking" ? "Barking" : "Paused";
+    big.textContent = clock(run.duration_seconds);
+    $("sub").textContent = d.state === "barking"
+      ? `since ${time(run.start)}`
+      : `quiet for ${Math.round(d.seconds_since_bark)} s · same bout if it resumes within ${Math.round(run.resumes_within_seconds)} s`;
+  } else {
+    $("state").textContent = "Quiet";
+    big.classList.add("small");
+    big.textContent = d.last_bark_end ? `Last barked ${ago(d.seconds_since_bark)}` : "No barking yet";
+    $("sub").textContent = d.last_bark_end ? `at ${time(d.last_bark_end)}` : "";
+  }
+
+  // Progress toward "counts as an episode" (shown while a run is open, even if audio stalls).
+  const prog = $("progress");
+  prog.hidden = !run;
+  if (run) {
+    const need = r.episode_min_minutes * 60;
+    $("fill").style.width = `${Math.min(100, (100 * run.duration_seconds) / need)}%`;
+    $("progress-text").textContent = run.is_episode
+      ? `Episode: past ${r.episode_min_minutes} min, so this bout counts toward a violation.`
+      : `Counts as an episode in ${clock(run.seconds_until_episode)} (at ${r.episode_min_minutes} min).`;
+  }
+
+  const score = d.last_score == null ? "–" : d.last_score.toFixed(2);
+  $("footer").textContent = `detector ${score} (barks at ≥ ${r.confidence_threshold.toFixed(2)}) · ${r.name}`;
+  document.title = run ? `${d.state === "barking" ? "🔴" : "🟡"} ${clock(run.duration_seconds)} · chase` : "chase · live";
+}
+
+function unreachable() {
+  main.dataset.state = "no_audio";
+  $("state").textContent = "Can't reach the listener";
+  $("big").classList.remove("small");
+  $("big").textContent = "–";
+  $("sub").textContent = "Retrying…";
+  $("progress").hidden = true;
+  $("footer").textContent = "";
+  document.title = "chase · offline";
+}
+
+async function poll() {
+  try {
+    const res = await fetch("/api/live", { cache: "no-store" });
+    if (!res.ok) throw new Error(res.status);
+    render(await res.json());
+  } catch { unreachable(); }
+  setTimeout(poll, 1000);
+}
+poll();
+</script>
+</body>
+</html>

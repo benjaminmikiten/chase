@@ -103,6 +103,10 @@ def run(settings: Settings) -> int:
         Spool(settings.data_dir / "spool", settings.capture_rate),
         metrics,
     )
+    if settings.ui_port is not None:
+        from chase.live import serve
+
+        serve(service.live, settings.ui_port)
     emit("listener_started", rules=settings.rules.name, capture_rate=settings.capture_rate)
     try:
         service.run(Capture(settings.capture_rate, settings.audio_device), stop=stop)

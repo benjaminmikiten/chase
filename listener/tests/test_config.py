@@ -48,6 +48,7 @@ def test_defaults_applied(tmp_path):
     assert s.backlog_days == 90
     assert s.data_dir == Path("/data")
     assert s.metrics_port == 9100
+    assert s.ui_port == 8080
 
 
 def test_unknown_preset_raises(tmp_path):
@@ -75,8 +76,15 @@ def test_unknown_top_level_key_raises(tmp_path):
         ("rules:\n  preset: san-antonio\nhop_seconds: 0\n", "hop_seconds"),
         ("rules:\n  preset: san-antonio\ntimezone: Mars/Base\n", "timezone"),
         ("rules:\n  preset: san-antonio\ncapture_rate: 44100\n", "capture_rate"),
+        ("rules:\n  preset: san-antonio\nui_port: 9100\n", "ui_port"),
+        ("rules:\n  preset: san-antonio\nui_port: 70000\n", "ui_port"),
     ],
 )
 def test_invalid_values_raise(tmp_path, snippet, key):
     with pytest.raises(ConfigError, match=key):
         load_settings(write(tmp_path, snippet), PRESETS)
+
+
+def test_ui_port_null_turns_the_page_off(tmp_path):
+    s = load_settings(write(tmp_path, "rules:\n  preset: san-antonio\nui_port: null\n"), PRESETS)
+    assert s.ui_port is None

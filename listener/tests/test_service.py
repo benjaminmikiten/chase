@@ -359,3 +359,25 @@ def test_no_backlog_clip_per_window(make_rig):
     assert not (rig.settings.data_dir / "backlog").exists() or not any(
         (rig.settings.data_dir / "backlog").rglob("*.flac")
     )
+
+
+def test_live_status_follows_windows_between_ticks(make_rig):
+    """The live page sees barking as each window is scored, without waiting for a tick."""
+    rig = make_rig([(T0, T0 + timedelta(minutes=3))])
+    rig.feed(T0, 3 * 60)
+    snap = rig.service.live.snapshot()
+    assert snap["state"] == "barking"
+    assert snap["run"]["duration_seconds"] == pytest.approx(3 * 60, abs=1)
+    assert rig.value("chase_barking_now") in (None, 0.0)  # the gauge waits for a tick
+
+
+def test_live_status_survives_a_restart_mid_bout(make_rig, tmp_path):
+    rig = make_rig([(T0, T0 + timedelta(minutes=5))])
+    rig.feed(T0, 5 * 60)
+    rig.log.close()
+    clock = Clock(rig.clock.t + timedelta(seconds=3))
+    again = make_rig([], clock=clock)
+    again.service.live.scored(clock.t, 0.1)
+    snap = again.service.live.snapshot()
+    assert snap["run"]["start"] == "2026-11-08T12:00:00Z"
+    assert snap["run"]["duration_seconds"] > 4 * 60

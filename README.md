@@ -28,6 +28,8 @@ exactly the wrong moments. `chase` does it all day, every day, on a spare comput
 
 - 🎙️ **Listens continuously** on a USB mic and scores every ~1 s of audio for dog sounds (bark,
   yip, howl, growl…).
+- 🔴 **Shows barking as it happens** on a live page: barking right now, how long the bout has
+  run, and how long until it counts as an episode, updated every second.
 - 📈 **Shows the pattern** on a Grafana dashboard: barking right now, bursts this hour against
   normal, today against the 30-day average, an hour × weekday heatmap, and a timeline.
 - ⚖️ **Applies your city's rule.** It turns raw detections into **episodes** (sustained barking)
@@ -167,6 +169,24 @@ Principles the code enforces:
 - **Nothing personal in this repo.** Addresses, emails, recordings, and credentials live in
   git-ignored config or a secret manager.
 
+## Live page
+
+Open `http://<the-box>:8080/` (`make live` prints the address) on a phone or laptop. It answers
+one question, faster than Grafana can: **is a dog barking right now, and for how long?**
+
+- **Barking** (red): the bout's length so far, when it started, and a bar toward the episode
+  threshold.
+- **Paused** (amber): quiet, but barking again within `max_gap_seconds` continues the same bout.
+- **Quiet** (green): when the last barking was.
+- **Not hearing audio** (grey): nothing has been scored for 5 s, so the mic or model is down.
+  The page never shows "quiet" when it can't hear.
+
+Grafana lags 15–40 s (10 s rules tick, 15 s scrape, remote write, panel refresh). The page is fed
+by every scored window and polls once a second. "How long" uses the same rule as
+`chase_current_run_seconds` and survives a listener restart mid-bout. The page has no login, so
+anyone on your network can open it. Set `CHASE_UI_PORT` in `.env` to publish it on another port,
+or `ui_port: null` in `chase.yaml` to turn it off.
+
 ## Dashboard and metrics
 
 The dashboard ([`grafana/dashboard.json`](grafana/dashboard.json)) has:
@@ -191,6 +211,7 @@ tier, which keeps about 14 days.
 
 ```bash
 make help            # everything below, and more
+make live            # address of the live page
 make status          # key metrics right now   ·  make watch   for a live view
 make logs            # follow events: episode, violation, capture_error, clock_reanchored…
 make episodes        # what's been recorded    ·  make violations  ·  make backlog
@@ -225,7 +246,7 @@ A few decisions that keep the evidence honest
 ```
 listener/          Python package `chase` (uv) + Dockerfile
   src/chase/       config · detector · audio · rules (pure) · store · baselines · evidence ·
-                   metrics · events · service (the loop) · cli
+                   metrics · events · live (the live page) · service (the loop) · cli
   tests/           pytest: synthetic audio only, no network, no real mic
 config/            example config + city presets
 compose.yaml       listener + Grafana Alloy
