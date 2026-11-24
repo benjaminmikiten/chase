@@ -9,7 +9,7 @@ LOG ?= $(HOME)/chase-auto-update.log
 REPO_DIR := $(shell pwd)
 
 .PHONY: help up down restart deploy logs logs-alloy ps status watch backlog episodes violations \
-        replay test-mic update install-cron uninstall-cron cron-log test
+        live replay test-mic update install-cron uninstall-cron cron-log test
 
 help: ## List the commands
 	@grep -E '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk -F':.*?## ' '{printf "  make %-15s %s\n", $$1, $$2}'
@@ -36,6 +36,9 @@ ps: ## Container status
 
 status: ## Key metrics right now: barking, episodes, health
 	@$(COMPOSE) exec -T listener curl -s localhost:9100/metrics | grep -E '^chase_(barking_windows_total|barks_total|barking_now|current_run_seconds|seconds_until_episode|episodes_total|episodes_in_window|violations_total|outbox_pending|heartbeat_timestamp_seconds|data_free_bytes|audio_errors_total)' | sort
+
+live: ## Print the live page's address (barking right now, and for how long)
+	@echo "http://$$(hostname -I 2>/dev/null | awk '{print $$1}' | grep . || hostname):$${CHASE_UI_PORT:-8080}/"
 
 watch: ## Live view of `make status` (Ctrl-C to quit)
 	@watch -n 2 '$(MAKE) --no-print-directory status'

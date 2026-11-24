@@ -25,6 +25,7 @@ from chase.config import Settings
 from chase.detector import loudness_dbfs, to_16k
 from chase.events import emit
 from chase.evidence import iso, prune_backlog, write_backlog_clip, write_episode, write_violation
+from chase.live import LiveStatus
 from chase.metrics import Metrics
 from chase.model import BarkWindow, Episode, RunStatus, Violation
 from chase.rules import assign_violations, bursts, current_run, finalized, find_episodes
@@ -40,6 +41,8 @@ CLOCK_JUMP_SECONDS = 2.0
 BACKLOG_CLIP = timedelta(seconds=5)
 BACKLOG_EVERY = timedelta(seconds=60)
 _VIOLATION_LOOKBACK = timedelta(hours=48)
+# How far back the live page looks for a bout already in progress at startup.
+_LIVE_LOOKBACK = timedelta(hours=6)
 
 
 class Scorer(Protocol):
@@ -79,6 +82,10 @@ class Service:
         self._written = 0
         self._windower: Windower | None = None
         metrics.episodes_per_window.set(self.rules.episodes_per_window)
+        now = clock()
+        self.live = LiveStatus(
+            self.rules, clock, log.windows_between(now - _LIVE_LOOKBACK, now + timedelta(seconds=1))
+        )
 
     # -- per window ---------------------------------------------------------------------------
 
@@ -93,6 +100,7 @@ class Service:
             return
         # Only after a successful score: a broken model must stop the heartbeat too.
         self.metrics.heartbeat.set(self.clock().timestamp())
+        self.live.scored(end, score)
         if score < self.rules.confidence_threshold:
             return
         loudness = loudness_dbfs(audio_native)
@@ -104,7 +112,9 @@ class Service:
             self._last_bark_end is None
             or (start - self._last_bark_end).total_seconds() > self.s.hop_seconds
         )
-        self.log.add_window(BarkWindow(start, end, score, loudness), burst_start)
+        window = BarkWindow(start, end, score, loudness)
+        self.log.add_window(window, burst_start)
+        self.live.bark(window)
         self._last_bark_end = max(end, self._last_bark_end or end)
         self.metrics.barking_windows.inc()
         if burst_start:

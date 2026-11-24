@@ -22,3 +22,4 @@ device_label: USB microphone   # printed in evidence metadata
 # model_path: /models/yamnet.tflite
 # class_map_path: /models/yamnet_class_map.csv
 # metrics_port: 9100
+# ui_port: 8080              # live page; null turns it off

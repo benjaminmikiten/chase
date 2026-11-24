@@ -49,6 +49,7 @@ class Settings:
     model_path: Path = Path("/models/yamnet.tflite")
     class_map_path: Path = Path("/models/yamnet_class_map.csv")
     metrics_port: int = 9100
+    ui_port: int | None = 8080  # the live page; null turns it off
     device_label: str = "USB microphone"
 
 
@@ -106,6 +107,10 @@ def _validate_settings(s: Settings) -> None:
     for key in ("pre_roll_seconds", "post_roll_seconds"):
         if getattr(s, key) < 0:
             raise ConfigError(f"{key} must be >= 0")
+    if s.ui_port is not None and (
+        not isinstance(s.ui_port, int) or not 0 < s.ui_port < 65536 or s.ui_port == s.metrics_port
+    ):
+        raise ConfigError("ui_port must be a free TCP port (not metrics_port), or null")
     if s.backlog_days < 1:
         raise ConfigError("backlog_days must be >= 1")
     try:
