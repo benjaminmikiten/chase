@@ -207,6 +207,15 @@ tier, which keeps about 14 days.
 | `chase_heartbeat_timestamp_seconds`, `chase_last_tick_success_timestamp_seconds` | liveness (heartbeat stops if the mic or model fails) |
 | `chase_audio_errors_total{reason}`, `chase_clock_corrections_total`, `chase_outbox_pending`, `chase_data_free_bytes` | health |
 
+### Day summary API
+
+The live page's server also answers `GET /api/day?start=<ISO>&end=<ISO>` (up to 7 days, times
+with a zone): bursts and barking time, bursts per local hour, the episodes and violations the
+rules recorded, the typical burst count for a span that long (30-day baseline), and the live
+state, so a report can tell a quiet night from a dead mic. It only reads the bark log; the JSON
+has a `schema_version` because other apps print it
+([fireball](https://github.com/evil-wizard-corp/fireball)'s 10pm barking report).
+
 ## Operations
 
 ```bash
@@ -246,7 +255,7 @@ A few decisions that keep the evidence honest
 ```
 listener/          Python package `chase` (uv) + Dockerfile
   src/chase/       config · detector · audio · rules (pure) · store · baselines · evidence ·
-                   metrics · events · live (the live page) · service (the loop) · cli
+                   metrics · events · live (the live page) · day (the day summary) · service · cli
   tests/           pytest: synthetic audio only, no network, no real mic
 config/            example config + city presets
 compose.yaml       listener + Grafana Alloy
