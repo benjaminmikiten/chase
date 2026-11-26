@@ -18,6 +18,7 @@ from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib.resources import files
 from typing import Any
+from urllib.parse import parse_qs
 
 from chase.config import RuleConfig
 from chase.model import BarkWindow
@@ -126,8 +127,29 @@ def _page() -> bytes:
     return files("chase").joinpath("live.html").read_bytes()
 
 
-def serve(live: LiveStatus, port: int, host: str = "0.0.0.0") -> ThreadingHTTPServer:
-    """Serve the page and its JSON on a daemon thread. Returns the server (for tests/shutdown)."""
+DaySummary = Callable[[datetime, datetime], dict[str, Any]]
+
+
+def _when(q: dict[str, list[str]], key: str) -> datetime:
+    v = (q.get(key) or [""])[0]
+    try:
+        d = datetime.fromisoformat(v.replace("Z", "+00:00"))
+    except ValueError:
+        msg = f"{key} must be an ISO time with a zone, like 2026-11-25T22:00-06:00"
+        raise ValueError(msg) from None
+    if d.tzinfo is None:
+        raise ValueError(f"{key} needs a zone (Z or an offset)")
+    return d
+
+
+def serve(
+    live: LiveStatus, port: int, host: str = "0.0.0.0", day: DaySummary | None = None
+) -> ThreadingHTTPServer:
+    """Serve the page and its JSON on a daemon thread. Returns the server (for tests/shutdown).
+
+    `day` answers `GET /api/day?start=..&end=..` (chase.day.summarize over the bark log), with
+    the live state added so a report can tell "quiet" from "the mic is down".
+    """
     page = _page()
 
     class Handler(BaseHTTPRequestHandler):
@@ -138,6 +160,15 @@ def serve(live: LiveStatus, port: int, host: str = "0.0.0.0") -> ThreadingHTTPSe
             elif path == "/api/live":
                 body = json.dumps(live.snapshot()).encode()
                 self._send(200, "application/json", body)
+            elif path == "/api/day" and day is not None:
+                q = parse_qs(self.path.split("?", 1)[1] if "?" in self.path else "")
+                try:
+                    summary = day(_when(q, "start"), _when(q, "end"))
+                except ValueError as e:
+                    self._send(400, "application/json", json.dumps({"error": str(e)}).encode())
+                    return
+                summary["live_state"] = live.snapshot()["state"]
+                self._send(200, "application/json", json.dumps(summary).encode())
             else:
                 self._send(404, "text/plain", b"not found\n")
 

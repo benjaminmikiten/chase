@@ -82,7 +82,7 @@ def bursts(windows: Sequence[BarkWindow], hop_seconds: float) -> list[list[BarkW
     return out
 
 
-def _barking_seconds(windows: list[BarkWindow]) -> float:
+def barking_seconds(windows: list[BarkWindow]) -> float:
     total = 0.0
     seg_start, seg_end = windows[0].start, windows[0].end
     for w in windows[1:]:
@@ -102,7 +102,7 @@ def _make_episode(windows: list[BarkWindow], merged_from: int, hop_seconds: floa
         end=_end(windows),
         windows=tuple(windows),
         bark_count=count_bursts(windows, hop_seconds),
-        barking_seconds=_barking_seconds(windows),
+        barking_seconds=barking_seconds(windows),
         longest_gap_seconds=max(gaps, default=0.0),
         mean_loudness_dbfs=fmean(w.loudness_dbfs for w in windows),
         merged_from=merged_from,

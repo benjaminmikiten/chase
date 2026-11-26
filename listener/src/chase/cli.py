@@ -104,9 +104,21 @@ def run(settings: Settings) -> int:
         metrics,
     )
     if settings.ui_port is not None:
+        from zoneinfo import ZoneInfo
+
+        from chase.day import summarize
         from chase.live import serve
 
-        serve(service.live, settings.ui_port)
+        db, tz = settings.data_dir / "chase.sqlite", ZoneInfo(settings.timezone)
+
+        def day(start, end):  # its own read-only connection: this runs on the HTTP thread
+            ro = BarkLog(db, read_only=True)
+            try:
+                return summarize(ro, start, end, tz)
+            finally:
+                ro.close()
+
+        serve(service.live, settings.ui_port, day=day)
     emit("listener_started", rules=settings.rules.name, capture_rate=settings.capture_rate)
     try:
         service.run(Capture(settings.capture_rate, settings.audio_device), stop=stop)
